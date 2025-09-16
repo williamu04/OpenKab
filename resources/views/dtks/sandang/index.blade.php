@@ -243,6 +243,8 @@
 
             $('#filter-tahun').on('change', function() {
                 dtks.ajax.reload();
+                data_grafik = [];
+                grafikPie();
             });
 
             $('#cetak').on('click', function() {

@@ -275,6 +275,8 @@
             // Event listener for year filter change
             $('#filter-tahun').on('change', function() {
                 adat.ajax.reload();
+                data_grafik = [];
+                grafikPie();
             });
             
             $('#cetak').on('click', function() {

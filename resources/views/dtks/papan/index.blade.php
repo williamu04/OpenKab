@@ -231,6 +231,8 @@
 
             $('#filter-tahun').on('change', function() {
                 dtks.ajax.reload();
+                data_grafik = [];
+                tampilChart('bar', 'barChart', generateChartData(data_grafik, 'label', 'Statistik Papan'));
             });
 
             $('#cetak').on('click', function() {

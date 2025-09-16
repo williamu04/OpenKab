@@ -276,6 +276,8 @@
 
             $('#filter-tahun').on('change', function() {
                 jaminanSosial.ajax.reload();
+                data_grafik = [];
+                grafikPie();
             });
 
             function format(data) {
