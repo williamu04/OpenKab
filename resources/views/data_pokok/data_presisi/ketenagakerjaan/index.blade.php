@@ -210,9 +210,9 @@
                 `;
             }
             $('#cetak').on('click', function() {
-                let baseUrl = "{{ route('data-pokok.data-presisi.cetak') }}";
+                let baseUrl = "{{ route('data-pokok.data-presisi-ketenagakerjaan.cetak') }}";
                 let params = dtks.ajax.params(); // Get DataTables params
-                let queryString = new URLSearchParams(params).toString(); // Convert params to query string
+                let queryString = new URLSearchParams(params).toString(); // Convert params to query string 
                 window.open(`${baseUrl}?${queryString}`, '_blank'); // Open the URL with appended query
             });
         })
