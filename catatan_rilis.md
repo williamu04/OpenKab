@@ -6,6 +6,7 @@ Di rilis ini, versi 2509.0.0 berisi penambahan dan perbaikan yang diminta penggu
 
 #### Perbaikan BUG
 
+1. [#822](https://github.com/OpenSID/OpenKab/issues/822) Perbaiki cetak datapresisi ketenagakerjaan.
 
 
 #### Perubahan Teknis
