@@ -1,4 +1,4 @@
-Di rilis ini, versi 2509.0.0 berisi penambahan dan perbaikan yang diminta pengguna.
+Di rilis ini, versi 2510.0.0 berisi penambahan dan perbaikan yang diminta pengguna.
 
 #### Penambahan Fitur
 
