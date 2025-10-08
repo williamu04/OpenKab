@@ -100,11 +100,19 @@
                     {{ __('adminlte::adminlte.register_a_new_membership') }}
                 </a>
             </p>
-        @endif
+        @endif        
 
         <a href="https://github.com/OpenSID/OpenKab" target="_blank">
             Versi {{ openkab_versi() }}
         </a>
+    </div>
+    <div class="d-flex">        
+        <p class="mb-1">
+            <a href="{{ route('otp-login.form') }}" class="text-primary">
+                <i class="fas fa-shield-alt mr-1"></i>
+                Login dengan OTP
+            </a>
+        </p>
     </div>
 @stop
 @section('auth_logo_label')
@@ -112,20 +120,15 @@
     <span x-data="identitas()" x-init="retrieveData()">
         <b x-text="dataIdentitas.nama_aplikasi"></b>
     </span>
-
-   <script nonce="{{ csp_nonce() }}">
-
-        const header = @include('layouts.components.header_bearer_api_gabungan')
-
+   <script nonce="{{ csp_nonce() }}"  >
+    // document.addEventListener("DOMContentLoaded", function(event) {
        function identitas() {
            return {
                id: 1,
                edit: '',
                dataIdentitas: {},
                retrieveData() {
-                   fetch('{{ url('api/v1/identitas') }}', {
-                    headers: header
-                   })
+                   fetch('{{ url('api/v1/identitas') }}')
                        .then(res => res.json())
                        .then(response => {
                            this.dataIdentitas = response.data.attributes;
@@ -134,6 +137,7 @@
                },
            }
        }
+    // })
    </script>
 @stop
 

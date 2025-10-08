@@ -39,6 +39,10 @@ class User extends Authenticatable
         'phone',
         'foto',
         'kode_kabupaten',
+        'otp_enabled',
+        'otp_channel',
+        'otp_identifier',
+        'telegram_chat_id',
     ];
 
     /**
@@ -184,5 +188,29 @@ class User extends Authenticatable
 
         // Fallback default
         return $query->whereRaw('1 = 0');
+    }
+
+    /**
+     * Relasi ke OTP Tokens
+     */
+    public function otpTokens()
+    {
+        return $this->hasMany(OtpToken::class);
+    }
+
+    /**
+     * Cek apakah user memiliki OTP aktif
+     */
+    public function hasOtpEnabled()
+    {
+        return $this->otp_enabled;
+    }
+
+    /**
+     * Get channel OTP yang aktif
+     */
+    public function getOtpChannels()
+    {
+        return $this->otp_channel ? json_decode($this->otp_channel, true) : [];
     }
 }

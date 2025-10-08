@@ -49,6 +49,14 @@ Auth::routes([
     'verify' => true,
 ]);
 
+// OTP Login Routes
+Route::prefix('login')->group(function () {
+    Route::get('/otp', [App\Http\Controllers\Auth\OtpLoginController::class, 'showLoginForm'])->name('otp-login.form');
+    Route::post('/otp/send', [App\Http\Controllers\Auth\OtpLoginController::class, 'sendOtp'])->name('otp-login.send');
+    Route::post('/otp/verify', [App\Http\Controllers\Auth\OtpLoginController::class, 'verifyOtp'])->name('otp-login.verify');
+    Route::post('/otp/resend', [App\Http\Controllers\Auth\OtpLoginController::class, 'resendOtp'])->name('otp-login.resend');
+});
+
 Route::get('pengaturan/logo', [IdentitasController::class, 'logo']);
 
 Route::middleware(['auth', 'teams_permission', 'password.weak'])->group(function () {
@@ -72,6 +80,24 @@ Route::middleware(['auth', 'teams_permission', 'password.weak'])->group(function
         });
         Route::resource('activities', RiwayatPenggunaController::class)->only(['index', 'show'])->middleware('easyauthorize:pengaturan-activities');
         Route::resource('settings', App\Http\Controllers\SettingController::class)->except(['show', 'create', 'delete'])->middleware('easyauthorize:pengaturan-settings');
+        
+        // OTP Routes
+        Route::middleware('easyauthorize:pengaturan-otp')->prefix('otp')->group(function () {
+            Route::get('/', [App\Http\Controllers\OtpController::class, 'index'])->name('otp.index');
+            Route::post('/setup', [App\Http\Controllers\OtpController::class, 'setup'])->name('otp.setup');
+            Route::post('/verify-activation', [App\Http\Controllers\OtpController::class, 'verifyActivation'])->name('otp.verify-activation');
+            Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
+            Route::post('/resend', [App\Http\Controllers\OtpController::class, 'resend'])->name('otp.resend');
+        });
+    });
+
+    // OTP Routes
+    Route::middleware('auth')->prefix('otp')->group(function () {
+        Route::get('/activate', [App\Http\Controllers\OtpController::class, 'index'])->name('otp.activate');
+        Route::post('/setup', [App\Http\Controllers\OtpController::class, 'setup'])->name('otp.setup');
+        Route::post('/verify-activation', [App\Http\Controllers\OtpController::class, 'verifyActivation'])->name('otp.verify-activation');
+        Route::post('/resend', [App\Http\Controllers\OtpController::class, 'resend'])->name('otp.resend');
+        Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
     });
 
     Route::prefix('cms')->group(function () {

@@ -233,4 +233,35 @@ return [
         'date' => env('FORMAT_DATE', 'd/m/Y'),
         'date_js' => env('FORMAT_DATE_JS', 'DD/MM/YYYY'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | OTP Configuration
+    |--------------------------------------------------------------------------
+    |
+    | These configuration values control the OTP token generation and validation.
+    | You may configure these values in your .env file.
+    |
+    */
+
+    'otp_token_expires_minutes' => env('OTP_TOKEN_EXPIRES_MINUTES', 5),
+    'otp_max_verification_attempts' => env('OTP_MAX_VERIFICATION_ATTEMPTS', 3),
+    'otp_length' => env('OTP_LENGTH', 6),
+
+    /*
+    |--------------------------------------------------------------------------
+    | OTP Rate Limiter Configuration
+    |--------------------------------------------------------------------------
+    |
+    | These configuration values control the rate limiting for OTP operations.
+    | You may configure these values in your .env file.
+    |
+    */
+
+    'otp_setup_max_attempts' => env('OTP_SETUP_MAX_ATTEMPTS', 3),
+    'otp_setup_decay_seconds' => env('OTP_SETUP_DECAY_SECONDS', 300),
+    'otp_verify_max_attempts' => env('OTP_VERIFY_MAX_ATTEMPTS', 5), 
+    'otp_verify_decay_seconds' => env('OTP_VERIFY_DECAY_SECONDS', 300),
+    'otp_resend_max_attempts' => env('OTP_RESEND_MAX_ATTEMPTS', 2),
+    'otp_resend_decay_seconds' => env('OTP_RESEND_DECAY_SECONDS', 30),
 ];
