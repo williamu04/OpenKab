@@ -82,23 +82,14 @@ Route::middleware(['auth', 'teams_permission', 'password.weak'])->group(function
         Route::resource('settings', App\Http\Controllers\SettingController::class)->except(['show', 'create', 'delete'])->middleware('easyauthorize:pengaturan-settings');
         
         // OTP Routes
-        Route::middleware('easyauthorize:pengaturan-otp')->prefix('otp')->group(function () {
-            Route::get('/', [App\Http\Controllers\OtpController::class, 'index'])->name('otp.index');
+        Route::prefix('otp')->group(function () {
+            Route::get('/activate', [App\Http\Controllers\OtpController::class, 'index'])->name('otp.activate');
             Route::post('/setup', [App\Http\Controllers\OtpController::class, 'setup'])->name('otp.setup');
             Route::post('/verify-activation', [App\Http\Controllers\OtpController::class, 'verifyActivation'])->name('otp.verify-activation');
-            Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
             Route::post('/resend', [App\Http\Controllers\OtpController::class, 'resend'])->name('otp.resend');
+            Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
         });
-    });
-
-    // OTP Routes
-    Route::middleware('auth')->prefix('otp')->group(function () {
-        Route::get('/activate', [App\Http\Controllers\OtpController::class, 'index'])->name('otp.activate');
-        Route::post('/setup', [App\Http\Controllers\OtpController::class, 'setup'])->name('otp.setup');
-        Route::post('/verify-activation', [App\Http\Controllers\OtpController::class, 'verifyActivation'])->name('otp.verify-activation');
-        Route::post('/resend', [App\Http\Controllers\OtpController::class, 'resend'])->name('otp.resend');
-        Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
-    });
+    });    
 
     Route::prefix('cms')->group(function () {
         Route::resource('categories', App\Http\Controllers\CMS\CategoryController::class)->except(['show'])->middleware('easyauthorize:website-categories');
