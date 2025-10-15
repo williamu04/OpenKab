@@ -63,10 +63,13 @@
                     <div class="card-body">                      
                         <!-- Informasi Detail OTP -->
                         <div class="row mb-4">
-                            <div class="col-md-4">
-                                <div class="info-box">
-                                    <h6 class="text-primary"><i class="fas fa-broadcast-tower mr-2"></i><strong>Channel Aktif:</strong></h6>
-                                    <div class="mt-2">
+                            <div class="col-md-6">
+                                <div class="alert alert-default border-0">
+                                    <h6 class="text-primary d-block mb-2">
+                                        <i class="fas fa-broadcast-tower mr-2"></i>
+                                        <strong>Channel Aktif:</strong>
+                                    </h6>
+                                    <div class="mt-2 d-block">
                                         @foreach($user->getOtpChannels() as $channel)
                                             <span class="badge badge-primary badge-lg mr-2 mb-1">
                                                 @if($channel === 'email')
@@ -79,16 +82,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="info-box">
+                            <div class="col-md-6">
+                                <div class="alert alert-default border-0">
                                     <h6 class="text-primary"><i class="fas fa-id-card mr-2"></i><strong>Identifier:</strong></h6>
                                     <div class="mt-2">
                                         <code class="bg-light p-2 rounded">{{ $user->otp_identifier }}</code>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="info-box">
+                            <div class="col-md-12">
+                                <div class="alert alert-default border-0">
                                     <h6 class="text-primary"><i class="fas fa-calendar-check mr-2"></i><strong>Status:</strong></h6>
                                     <div class="mt-2">
                                         <small class="text-success d-block">
@@ -103,28 +106,6 @@
                             </div>
                         </div>
 
-                        <!-- Status Keamanan -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="alert alert-info border-0">
-                                    <h6 class="text-info mb-2"><i class="fas fa-shield-alt mr-2"></i>Status Keamanan</h6>
-                                    <div class="row text-sm">
-                                        <div class="col-md-4">
-                                            <i class="fas fa-check text-success mr-2"></i>
-                                            <strong>Two-Factor Authentication</strong>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <i class="fas fa-check text-success mr-2"></i>
-                                            <strong>Akses Cepat Tanpa Password</strong>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <i class="fas fa-check text-success mr-2"></i>
-                                            <strong>Perlindungan Anti-Phishing</strong>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <hr>
                         
@@ -232,19 +213,8 @@
                             Keamanan Terlindungi
                         </h3>
                     </div>
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            <i class="fas fa-shield-check fa-3x text-success"></i>
-                            <h5 class="mt-2 text-success">Akun Aman</h5>
-                        </div>
-                        
-                        <h6><strong>Keunggulan yang Aktif:</strong></h6>
+                    <div class="card-body">                        
                         <ul class="text-sm list-unstyled">
-                            <li class="mb-2">
-                                <i class="fas fa-check text-success mr-2"></i>
-                                <strong>Two-Factor Authentication</strong>
-                                <small class="d-block text-muted ml-4">Lapisan keamanan ganda</small>
-                            </li>
                             <li class="mb-2">
                                 <i class="fas fa-check text-success mr-2"></i>
                                 <strong>Login Tanpa Password</strong>
