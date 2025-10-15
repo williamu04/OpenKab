@@ -46,7 +46,7 @@ class OtpService
             
             return [
                 'success' => true,
-                'message' => 'Kode OTP berhasil dikirim',
+                'message' => 'Kode Token berhasil dikirim',
                 'channel' => $channel
             ];
             

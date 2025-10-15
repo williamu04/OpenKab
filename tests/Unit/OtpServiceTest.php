@@ -39,7 +39,7 @@ class OtpServiceTest extends TestCase
         );
 
         $this->assertTrue($result['success']);
-        $this->assertEquals('Kode OTP berhasil dikirim', $result['message']);
+        $this->assertEquals('Kode Token berhasil dikirim', $result['message']);
         $this->assertEquals('email', $result['channel']);
 
         // Verify OTP token was created
@@ -72,7 +72,7 @@ class OtpServiceTest extends TestCase
         );
 
         $this->assertTrue($result['success']);
-        $this->assertEquals('Kode OTP berhasil dikirim', $result['message']);
+        $this->assertEquals('Kode Token berhasil dikirim', $result['message']);
         $this->assertEquals('telegram', $result['channel']);
 
         // Verify OTP token was created
@@ -151,7 +151,7 @@ class OtpServiceTest extends TestCase
         $result = $this->otpService->verify($this->user->id, $otp);
 
         $this->assertTrue($result['success']);
-        $this->assertEquals('Kode OTP berhasil diverifikasi', $result['message']);
+        $this->assertEquals('Kode Token berhasil diverifikasi', $result['message']);
 
         // Verify token was deleted after successful verification
         $this->assertEquals(0, OtpToken::where('user_id', $this->user->id)->count());
@@ -174,7 +174,7 @@ class OtpServiceTest extends TestCase
         $result = $this->otpService->verify($this->user->id, $incorrectOtp);
 
         $this->assertFalse($result['success']);
-        $this->assertStringContainsString('Kode OTP salah', $result['message']);
+        $this->assertStringContainsString('Kode Token salah', $result['message']);
         $this->assertStringContainsString('Percobaan tersisa: 1', $result['message']);
 
         // Verify attempts were incremented
@@ -198,7 +198,7 @@ class OtpServiceTest extends TestCase
         $result = $this->otpService->verify($this->user->id, $otp);
 
         $this->assertFalse($result['success']);
-        $this->assertEquals('Token OTP tidak ditemukan atau sudah kedaluwarsa', $result['message']);
+        $this->assertEquals('Token tidak ditemukan atau sudah kedaluwarsa', $result['message']);
     }
 
     /** @test */
@@ -226,7 +226,7 @@ class OtpServiceTest extends TestCase
         $result = $this->otpService->verify($this->user->id, '123456');
 
         $this->assertFalse($result['success']);
-        $this->assertEquals('Token OTP tidak ditemukan atau sudah kedaluwarsa', $result['message']);
+        $this->assertEquals('Token tidak ditemukan atau sudah kedaluwarsa', $result['message']);
     }
 
     /** @test */
@@ -260,7 +260,7 @@ class OtpServiceTest extends TestCase
         );
 
         $this->assertTrue($result['success']);
-        $this->assertEquals('Kode OTP berhasil dikirim', $result['message']);
+        $this->assertEquals('Kode Token berhasil dikirim', $result['message']);
         $this->assertEquals('email', $result['channel']);
 
         // Verify token properties

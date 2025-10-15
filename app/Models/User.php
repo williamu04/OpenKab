@@ -63,6 +63,8 @@ class User extends Authenticatable
         'last_login' => 'datetime',
         'email_verified_at' => 'datetime',
         'tempat_dilahirkan' => Enums\StatusEnum::class,
+        '2fa_enabled' => 'boolean',
+        'otp_enabled' => 'boolean',
     ];
 
     public function teams()
