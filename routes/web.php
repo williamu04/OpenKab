@@ -59,7 +59,7 @@ Route::prefix('login')->group(function () {
 
 Route::get('pengaturan/logo', [IdentitasController::class, 'logo']);
 
-Route::middleware(['auth', 'teams_permission', 'password.weak'])->group(function () {
+Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(function () {
     Route::get('catatan-rilis', CatatanRilis::class);
     Route::get('/dasbor', [DasborController::class, 'index'])->name('dasbor');
     Route::get('dasbor-demografi', [DasborDemografiController::class, 'index'])->name('dasbor-demografi');
@@ -89,6 +89,17 @@ Route::middleware(['auth', 'teams_permission', 'password.weak'])->group(function
             Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
             Route::post('/resend', [App\Http\Controllers\OtpController::class, 'resend'])->name('otp.resend');
         });
+
+        // 2FA Routes
+        Route::prefix('2fa')->group(function () {
+            Route::get('/', [App\Http\Controllers\TwoFactorController::class, 'index'])->name('2fa.index');
+            Route::get('/enable', [App\Http\Controllers\TwoFactorController::class, 'showEnableForm'])->name('2fa.enable-form');
+            Route::post('/enable', [App\Http\Controllers\TwoFactorController::class, 'enable'])->name('2fa.enable');
+            Route::get('/verify', [App\Http\Controllers\TwoFactorController::class, 'showVerifyForm'])->name('2fa.verify-form');
+            Route::post('/verify', [App\Http\Controllers\TwoFactorController::class, 'verifyEnable'])->name('2fa.verify');
+            Route::post('/disable', [App\Http\Controllers\TwoFactorController::class, 'disable'])->name('2fa.disable');
+            Route::post('/resend', [App\Http\Controllers\TwoFactorController::class, 'resend'])->name('2fa.resend');
+        });
     });
 
     // OTP Routes
@@ -98,6 +109,12 @@ Route::middleware(['auth', 'teams_permission', 'password.weak'])->group(function
         Route::post('/verify-activation', [App\Http\Controllers\OtpController::class, 'verifyActivation'])->name('otp.verify-activation');
         Route::post('/resend', [App\Http\Controllers\OtpController::class, 'resend'])->name('otp.resend');
         Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
+    });
+
+    // 2FA Challenge Routes (tanpa middleware 2fa untuk menghindari loop)
+    Route::middleware('auth')->prefix('2fa')->group(function () {
+        Route::get('/challenge', [App\Http\Controllers\TwoFactorController::class, 'showChallenge'])->name('2fa.challenge');
+        Route::post('/challenge', [App\Http\Controllers\TwoFactorController::class, 'verifyChallenge'])->name('2fa.challenge.verify');
     });
 
     Route::prefix('cms')->group(function () {

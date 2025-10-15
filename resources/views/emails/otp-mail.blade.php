@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kode OTP OpenKab</title>
+    <title>Kode Token OpenKab</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -114,13 +114,13 @@
     <div class="container">
         <div class="header">
             <div class="logo">🔐</div>
-            <h1>Kode OTP OpenKab</h1>
-            <p style="color: #6c757d; margin: 10px 0 0;">Sistem Autentikasi Passwordless</p>
+            <h1>Kode Token OpenKab</h1>
+            <p style="color: #6c757d; margin: 10px 0 0;">Sistem Autentikasi Tanpa Password atau 2FA</p>
         </div>
 
         <p style="font-size: 16px;">Halo,</p>
 
-        <p>Anda telah meminta kode OTP untuk aktivasi fitur autentikasi passwordless di sistem OpenKab. Gunakan kode berikut untuk menyelesaikan proses verifikasi:</p>
+        <p>Anda telah meminta kode token untuk sistem OpenKab. Gunakan kode berikut untuk menyelesaikan proses verifikasi:</p>
 
         <div class="otp-code">
             {{ $otp }}
@@ -146,8 +146,7 @@
             <ul style="margin: 10px 0;">
                 <li>Kode ini berlaku selama <strong>5 menit</strong> dari waktu pengiriman</li>
                 <li>Kode hanya dapat digunakan <strong>satu kali</strong></li>
-                <li>Maksimal <strong>3 kali percobaan</strong> salah sebelum kode diblokir</li>
-                <li>Setelah berhasil, fitur OTP akan aktif sebagai alternatif login</li>
+                <li>Maksimal <strong>3 kali percobaan</strong> salah sebelum kode diblokir</li>                
             </ul>
         </div>
 

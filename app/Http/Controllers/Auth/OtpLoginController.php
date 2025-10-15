@@ -7,6 +7,7 @@ use App\Http\Requests\OtpLoginRequest;
 use App\Http\Requests\OtpVerifyRequest;
 use App\Models\User;
 use App\Services\OtpService;
+use App\Services\TwoFactorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -14,11 +15,13 @@ use Illuminate\Support\Facades\RateLimiter;
 class OtpLoginController extends Controller
 {
     protected $otpService;
+    protected $twoFactorService;
 
-    public function __construct(OtpService $otpService)
+    public function __construct(OtpService $otpService, TwoFactorService $twoFactorService)
     {
         $this->middleware('guest')->except('logout');
         $this->otpService = $otpService;
+        $this->twoFactorService = $twoFactorService;
     }
 
     /**
@@ -119,6 +122,25 @@ class OtpLoginController extends Controller
             // Clear session
             $request->session()->forget(['otp_login_user_id', 'otp_login_channel']);
             RateLimiter::clear($key);
+            
+            // Check if user has 2FA enabled
+            if ($this->twoFactorService->hasTwoFactorEnabled($user)) {
+                // Send OTP for 2FA verification
+                $channels = $this->twoFactorService->getTwoFactorChannels($user);
+                $channel = $channels[0] ?? 'email';
+                $identifier = $this->twoFactorService->getTwoFactorIdentifier($user);
+                
+                $this->otpService->generateAndSend($user->id, $channel, $identifier);
+                
+                // Clear 2FA verification session to require new verification
+                session()->forget('2fa_verified');
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Login berhasil. Silakan verifikasi 2FA',
+                    'redirect' => route('2fa.challenge')
+                ]);
+            }
             
             return response()->json([
                 'success' => true,
