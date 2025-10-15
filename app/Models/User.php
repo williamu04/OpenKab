@@ -43,6 +43,9 @@ class User extends Authenticatable
         'otp_channel',
         'otp_identifier',
         'telegram_chat_id',
+        '2fa_enabled',
+        '2fa_channel',
+        '2fa_identifier',
     ];
 
     /**

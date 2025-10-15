@@ -127,7 +127,7 @@ class TwoFactorController extends Controller
         if ($result['success']) {
             // Aktivasi 2FA berhasil
             $this->twoFactorService->enableTwoFactor(Auth::user(), $tempConfig['channel'], $tempConfig['identifier']);
-
+            session(['2fa_verified' => true]);
             // Hapus konfigurasi sementara
             $request->session()->forget('temp_2fa_config');
             RateLimiter::clear($key);

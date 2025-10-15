@@ -30,10 +30,7 @@
                             <small class="form-text text-muted">Masukkan kode 6 digit yang telah dikirim</small>
                         </div>
                         
-                        <div class="d-flex justify-content-between align-items-center">
-                            <button type="button" class="btn btn-outline-secondary" id="backBtn">
-                                <i class="fas fa-arrow-left mr-2"></i>Kembali
-                            </button>
+                        <div class="d-flex justify-content-between align-items-center">                            
                             <div>
                                 <button type="button" class="btn btn-outline-primary mr-2" id="resendBtn">
                                     <i class="fas fa-redo mr-2"></i>Kirim Ulang
@@ -131,12 +128,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 btn.prop('disabled', false).html(originalText);
             }
         });
-    });
-    
-    // Back button
-    $('#backBtn').click(function() {
-        window.location.href = '{{ route("2fa.enable-form") }}';
-    });
+    });    
     
     // Resend OTP
     $('#resendBtn').click(function() {

@@ -1,134 +1,157 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Verifikasi Two-Factor Authentication</title>
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="{{ asset('vendor/adminlte_dist/css/adminlte.min.css') }}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-box {
-            width: 400px;
-            max-width: 90%;
-        }
-        .login-card {
-            border: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            overflow: hidden;
-        }
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-bottom: none;
-            text-align: center;
-            padding: 30px 20px;
-        }
-        .otp-input {
-            letter-spacing: 8px;
-            font-size: 28px;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            text-align: center;
-            height: 60px;
-            border-radius: 10px;
-            border: 2px solid #e9ecef;
-            transition: all 0.3s ease;
-        }
-        .otp-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-        .btn-verify {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            transition: all 0.3s ease;
-        }
-        .btn-verify:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        .logo-icon {
-            font-size: 60px;
-            color: white;
-            margin-bottom: 15px;
-        }
-        .shield-animation {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-    </style>
-</head>
-<body>
-<div class="login-box">
-    <div class="card login-card">
-        <div class="card-header">
-            <div class="logo-icon shield-animation">
-                <i class="fas fa-shield-alt"></i>
+@extends('adminlte::auth.auth-page', ['auth_type' => 'login'])
+
+@php( $login_url = View::getSection('login_url') ?? config('adminlte.login_url', 'login') )
+@php( $register_url = View::getSection('register_url') ?? config('adminlte.register_url', 'register') )
+@php( $password_reset_url = View::getSection('password_reset_url') ?? config('adminlte.password_reset_url', 'password/reset') )
+
+@if (config('adminlte.use_route_url', false))
+    @php( $login_url = $login_url ? route($login_url) : '' )
+    @php( $register_url = $register_url ? route($register_url) : '' )
+    @php( $password_reset_url = $password_reset_url ? route($password_reset_url) : '' )
+@else
+    @php( $login_url = $login_url ? url($login_url) : '' )
+    @php( $register_url = $register_url ? url($register_url) : '' )
+    @php( $password_reset_url = $password_reset_url ? url($password_reset_url) : '' )
+@endif
+
+@section('auth_header', 'Verifikasi Two-Factor Authentication')
+
+@section('auth_body')
+    <div class="text-center mb-3">
+        <div class="mb-3">
+            <i class="fas fa-shield-alt fa-3x text-primary"></i>
+        </div>
+        <h4 class="mb-1">🔐 Verifikasi 2FA</h4>
+        <p class="text-muted">Masukkan kode verifikasi untuk melanjutkan</p>
+    </div>
+
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+    
+    <p class="text-center text-muted mb-4">
+        Kode verifikasi telah dikirim ke channel terdaftar
+    </p>
+    
+    <form id="2faChallengeForm" action="{{ route('2fa.challenge.verify') }}" method="POST">
+        @csrf
+        <div class="input-group mb-3">
+            <input type="text" class="form-control form-control-lg text-center @error('code') is-invalid @enderror"
+                name="code" id="code" placeholder="000000" maxlength="6" required autofocus>
+            <div class="input-group-append">
+                <div class="input-group-text">
+                    <span class="fas fa-key {{ config('adminlte.classes_auth_icon', '') }}"></span>
+                </div>
             </div>
-            <h3 class="text-white mb-0">Verifikasi Two-Factor Authentication</h3>
-            <p class="text-white-50 mb-0">Masukkan kode verifikasi untuk melanjutkan</p>
+            @error('code')
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
+            @enderror
         </div>
-        <div class="card-body p-4">
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
-            
-            <p class="text-center text-muted mb-4">
-                Kode verifikasi telah dikirim ke channel terdaftar
-            </p>
-            
-            <form id="2faChallengeForm" action="{{ route('2fa.challenge.verify') }}" method="POST">
-                @csrf
-                <div class="form-group">
-                    <input type="text" class="form-control otp-input" id="code" name="code" placeholder="000000" maxlength="6" required autofocus>
-                </div>
-                
-                <div class="form-group">
-                    <button type="submit" class="btn btn-verify btn-block btn-lg text-white">
-                        <i class="fas fa-check mr-2"></i>Verifikasi & Lanjutkan
-                    </button>
-                </div>
-                
-                <div class="text-center">
-                    <button type="button" class="btn btn-link text-muted" id="resendBtn">
-                        <i class="fas fa-redo mr-1"></i>Kirim Ulang Kode
-                    </button>
-                </div>
-                
-                <div class="text-center mt-3">
-                    <small class="text-muted">
-                        <i class="fas fa-clock mr-1"></i>
-                        Kode akan kadaluarsa dalam <span id="countdown">5:00</span>
-                    </small>
-                </div>
-            </form>
-        </div>
-        <div class="card-footer text-center p-3 bg-light">
+        
+        <div class="text-center mb-3">
             <small class="text-muted">
-                <i class="fas fa-lock mr-1"></i>
-                Koneksi aman • Two-Factor Authentication
+                Kode berlaku selama <span id="countdown" class="font-weight-bold text-primary">5:00</span> menit
             </small>
         </div>
-    </div>
-</div>
+        
+        <div class="row">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-check mr-2"></i>Verifikasi & Lanjutkan
+                </button>
+            </div>
+        </div>
+    </form>
 
-<script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <div class="text-center mt-3">
+        <button type="button" class="btn btn-link" id="resendBtn">
+            <i class="fas fa-redo mr-1"></i>
+            Kirim Ulang (<span id="resendCountdown">30</span>s)
+        </button>
+    </div>
+
+    <div class="text-center mt-3">
+        <a href="{{ $login_url }}" class="btn btn-link">
+            <i class="fas fa-arrow-left mr-1"></i>
+            Kembali ke Login
+        </a>
+    </div>
+@stop
+
+@section('auth_footer')
+    <div class="text-center">
+        <div class="row">
+            <div class="col">
+                <small class="text-muted">
+                    <i class="fas fa-lock mr-1"></i>
+                    Koneksi aman • 2FA
+                </small>
+            </div>
+        </div>
+        
+        <div class="row mt-2">
+            <div class="col">
+                <div class="d-flex justify-content-center align-items-center">
+                    <span class="badge badge-info mr-2">
+                        <i class="fas fa-envelope mr-1"></i>
+                        Email
+                    </span>
+                    <span class="badge badge-info">
+                        <i class="fab fa-telegram mr-1"></i>
+                        Telegram
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+@stop
+
+@section('adminlte_css')
+    <style>
+        .auth-body {
+            padding: 20px;
+        }
+        
+        #code {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 8px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .badge {
+            font-size: 0.8em;
+        }
+        
+        .countdown-expired {
+            color: #dc3545 !important;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-block {
+            font-weight: 600;
+        }
+        
+        .text-primary {
+            color: #007bff !important;
+        }
+        
+        .text-success {
+            color: #28a745 !important;
+        }
+    </style>
+@stop
+
+@section('adminlte_js')
 <script src="{{ asset('vendor/sweetalert2/dist/sweetalert2.min.js') }}"></script>
-<script nonce="{{  csp_nonce() }}">
+<script nonce="{{ csp_nonce() }}">
 document.addEventListener("DOMContentLoaded", function (event) {
     let countdownTimer;
     let resendTimer;
@@ -143,6 +166,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
     
     // Start countdown
     startCountdown(300); // 5 minutes in seconds
+    startResendCountdown(30); // 30 seconds cooldown
+    $('#code').focus();
     
     // Verify form submission
     $('#2faChallengeForm').submit(function(e) {
@@ -151,9 +176,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
         if (code.length !== 6) {
             Swal.fire({
                 icon: 'warning',
-                title: 'Peringatan!',
-                text: 'Kode verifikasi harus 6 digit',
-                confirmButtonColor: '#667eea'
+                title: 'Peringatan',
+                text: 'Kode verifikasi harus 6 digit'
             });
             return false;
         }
@@ -169,9 +193,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
             success: function(response) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Berhasil!',
-                    text: response.message,
-                    confirmButtonColor: '#667eea'
+                    title: 'Berhasil',
+                    text: response.message
                 }).then(() => {
                     window.location.href = response.redirect;
                 });
@@ -180,9 +203,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 const response = xhr.responseJSON;
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error!',
-                    text: response.message || 'Verifikasi gagal',
-                    confirmButtonColor: '#667eea'
+                    title: 'Gagal',
+                    text: response.message || 'Verifikasi gagal'
                 });
                 $('#code').val('').focus();
             },
@@ -197,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         const btn = $(this);
         const originalText = btn.html();
         
-        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Mengirim...');
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...');
         
         $.ajax({
             url: '{{ route("2fa.resend") }}',
@@ -206,9 +228,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
             success: function(response) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Berhasil!',
-                    text: response.message,
-                    confirmButtonColor: '#667eea'
+                    title: 'Berhasil',
+                    text: response.message
                 });
                 startCountdown(300); // Reset countdown
                 startResendCountdown(30); // 30 seconds cooldown
@@ -217,9 +238,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 const response = xhr.responseJSON;
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error!',
-                    text: response.message || 'Gagal mengirim ulang',
-                    confirmButtonColor: '#667eea'
+                    title: 'Gagal',
+                    text: response.message || 'Gagal mengirim ulang'
                 });
             },
             complete: function() {
@@ -239,7 +259,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
             
             if (timeLeft <= 0) {
                 clearInterval(countdownTimer);
-                $('#countdown').text('Kedaluwarsa').addClass('text-danger');
+                $('#countdown').text('Kedaluwarsa').addClass('countdown-expired');
             }
             timeLeft--;
         }, 1000);
@@ -251,16 +271,16 @@ document.addEventListener("DOMContentLoaded", function (event) {
         $('#resendBtn').prop('disabled', true);
         
         resendTimer = setInterval(function() {
-            $('#resendBtn').html('<i class="fas fa-redo mr-1"></i>Kirim Ulang (' + timeLeft + ')');
+            $('#resendCountdown').text(timeLeft);
             
             if (timeLeft <= 0) {
                 clearInterval(resendTimer);
-                $('#resendBtn').prop('disabled', false).html('<i class="fas fa-redo mr-1"></i>Kirim Ulang Kode');
+                $('#resendBtn').prop('disabled', false);
+                $('#resendBtn').html('<i class="fas fa-redo mr-1"></i>Kirim Ulang');
             }
             timeLeft--;
         }, 1000);
     }
 });
 </script>
-</body>
-</html>
+@stop
