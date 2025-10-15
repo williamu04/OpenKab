@@ -82,40 +82,24 @@ Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(f
         Route::resource('settings', App\Http\Controllers\SettingController::class)->except(['show', 'create', 'delete'])->middleware('easyauthorize:pengaturan-settings');
         
         // OTP Routes
-        Route::middleware('easyauthorize:pengaturan-otp')->prefix('otp')->group(function () {
-            Route::get('/', [App\Http\Controllers\OtpController::class, 'index'])->name('otp.index');
+        Route::prefix('otp')->group(function () {            
+            Route::get('/', [App\Http\Controllers\OtpController::class, 'index'])->name('otp.activate');
             Route::post('/setup', [App\Http\Controllers\OtpController::class, 'setup'])->name('otp.setup');
             Route::post('/verify-activation', [App\Http\Controllers\OtpController::class, 'verifyActivation'])->name('otp.verify-activation');
-            Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
             Route::post('/resend', [App\Http\Controllers\OtpController::class, 'resend'])->name('otp.resend');
+            Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
         });
 
         // 2FA Routes
         Route::prefix('2fa')->group(function () {
-            Route::get('/', [App\Http\Controllers\TwoFactorController::class, 'index'])->name('2fa.index');
-            Route::get('/enable', [App\Http\Controllers\TwoFactorController::class, 'showEnableForm'])->name('2fa.enable-form');
+            Route::get('/', [App\Http\Controllers\TwoFactorController::class, 'index'])->name('2fa.index');            
             Route::post('/enable', [App\Http\Controllers\TwoFactorController::class, 'enable'])->name('2fa.enable');
             Route::get('/verify', [App\Http\Controllers\TwoFactorController::class, 'showVerifyForm'])->name('2fa.verify-form');
             Route::post('/verify', [App\Http\Controllers\TwoFactorController::class, 'verifyEnable'])->name('2fa.verify');
             Route::post('/disable', [App\Http\Controllers\TwoFactorController::class, 'disable'])->name('2fa.disable');
             Route::post('/resend', [App\Http\Controllers\TwoFactorController::class, 'resend'])->name('2fa.resend');
         });
-    });
-
-    // OTP Routes
-    Route::middleware('auth')->prefix('otp')->group(function () {
-        Route::get('/activate', [App\Http\Controllers\OtpController::class, 'index'])->name('otp.activate');
-        Route::post('/setup', [App\Http\Controllers\OtpController::class, 'setup'])->name('otp.setup');
-        Route::post('/verify-activation', [App\Http\Controllers\OtpController::class, 'verifyActivation'])->name('otp.verify-activation');
-        Route::post('/resend', [App\Http\Controllers\OtpController::class, 'resend'])->name('otp.resend');
-        Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
-    });
-
-    // 2FA Challenge Routes (tanpa middleware 2fa untuk menghindari loop)
-    Route::middleware('auth')->prefix('2fa')->group(function () {
-        Route::get('/challenge', [App\Http\Controllers\TwoFactorController::class, 'showChallenge'])->name('2fa.challenge');
-        Route::post('/challenge', [App\Http\Controllers\TwoFactorController::class, 'verifyChallenge'])->name('2fa.challenge.verify');
-    });
+    });    
 
     Route::prefix('cms')->group(function () {
         Route::resource('categories', App\Http\Controllers\CMS\CategoryController::class)->except(['show'])->middleware('easyauthorize:website-categories');
@@ -359,6 +343,12 @@ Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(f
     Route::get('desa/cetak', [DesaController::class, 'cetak']);
     Route::resource('kecamatan', KecamatanController::class)->only(['index']);
     Route::get('kecamatan/cetak', [KecamatanController::class, 'cetak']);
+});
+
+// 2FA Challenge Routes (tanpa middleware 2fa untuk menghindari loop)
+Route::middleware('auth')->prefix('2fa')->group(function () {
+    Route::get('/challenge', [App\Http\Controllers\TwoFactorController::class, 'showChallenge'])->name('2fa.challenge');
+    Route::post('/challenge', [App\Http\Controllers\TwoFactorController::class, 'verifyChallenge'])->name('2fa.challenge.verify');
 });
 
 Route::prefix('presisi')->middleware('check.presisi')->group(function () {

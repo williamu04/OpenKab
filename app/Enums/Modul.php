@@ -349,14 +349,12 @@ final class Modul extends Enum
                 [
                     'text' => 'Aktivasi OTP',
                     'icon' => 'far fa-fw fa-circle',
-                    'url' => 'pengaturan/otp',
-                    'permission' => 'pengaturan-otp',
+                    'url' => 'pengaturan/otp',                    
                 ],
                 [
                     'text' => 'Aktivasi 2FA',
                     'icon' => 'far fa-fw fa-circle',
-                    'url' => 'pengaturan/2fa',
-                    'permission' => 'pengaturan-2fa',
+                    'url' => 'pengaturan/2fa',                                  
                 ]
             ],
         ],

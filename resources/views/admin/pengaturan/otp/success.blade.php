@@ -16,9 +16,9 @@
             <p class="mb-0">Anda sekarang dapat menggunakan login OTP sebagai alternatif yang lebih aman. Silakan logout dan coba fitur "Login dengan OTP" di halaman login.</p>
         </div>
         <div class="mt-4">
-            <a href="{{ url('/admin') }}" class="btn btn-primary btn-sm mr-2">
+            <a href="{{ url('/dasbor') }}" class="btn btn-primary btn-sm mr-2">
                 <i class="fas fa-home mr-2"></i>
-                Ke Dashboard
+                Ke Dasbor
             </a>
             <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.location.reload()">
                 <i class="fas fa-cog mr-2"></i>

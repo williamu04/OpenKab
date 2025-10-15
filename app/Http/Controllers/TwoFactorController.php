@@ -30,17 +30,7 @@ class TwoFactorController extends Controller
         $twoFactorStatus = $this->twoFactorService->getUserTwoFactorStatus($user);
         
         return view('admin.pengaturan.2fa.index', compact('user', 'twoFactorStatus'));
-    }
-
-    /**
-     * Tampilkan form aktivasi 2FA
-     */
-    public function showEnableForm()
-    {
-        $user = Auth::user();
-        
-        return view('admin.pengaturan.2fa.enable', compact('user'));
-    }
+    }   
 
     /**
      * Proses aktivasi 2FA

@@ -67,7 +67,7 @@ class OtpService
         }
         
         $expiresMinutes = config('app.otp_token_expires_minutes', 5);
-        $message = "🔐 *Kode OTP OpenKab*\n\n";
+        $message = "🔐 *Kode Token OpenKab*\n\n";
         $message .= "Kode verifikasi Anda: *{$otp}*\n\n";
         $message .= "Kode berlaku selama {$expiresMinutes} menit.\n";
         $message .= "Jangan bagikan kode ini kepada siapa pun!";
@@ -92,7 +92,7 @@ class OtpService
         if (!$token) {
             return [
                 'success' => false,
-                'message' => 'Token OTP tidak ditemukan atau sudah kedaluwarsa'
+                'message' => 'Token tidak ditemukan atau sudah kedaluwarsa'
             ];
         }
         
@@ -109,7 +109,7 @@ class OtpService
             Log::info('OTP Verified Successfully', ['user_id' => $userId]);
             return [
                 'success' => true,
-                'message' => 'Kode OTP berhasil diverifikasi'
+                'message' => 'Kode Token berhasil diverifikasi'
             ];
         } else {
             $token->increment('attempts');
@@ -117,7 +117,7 @@ class OtpService
             Log::warning('OTP Verification Failed', ['user_id' => $userId, 'attempts' => $token->attempts + 1]);
             return [
                 'success' => false,
-                'message' => 'Kode OTP salah. Percobaan tersisa: ' . ($maxAttempts - ($token->attempts + 1))
+                'message' => 'Kode Token salah. Percobaan tersisa: ' . ($maxAttempts - ($token->attempts + 1))
             ];
         }
     }

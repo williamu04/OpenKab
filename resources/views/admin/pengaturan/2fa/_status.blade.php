@@ -16,17 +16,17 @@
         <ul class="text-sm list-unstyled">
             <li class="mb-2">
                 <i class="fas fa-check text-success mr-2"></i>
-                <strong>Password Authentication</strong>
+                <strong>Password Otentikasi</strong>
                 <small class="d-block text-muted ml-4">Login dengan password</small>
             </li>
             <li class="mb-2">
                 <i class="fas fa-check text-success mr-2"></i>
-                <strong>OTP Authentication</strong>
+                <strong>OTP Otentikasi</strong>
                 <small class="d-block text-muted ml-4">Login tanpa password</small>
             </li>
             <li class="mb-2">
                 <i class="fas fa-check text-success mr-2"></i>
-                <strong>Two-Factor Authentication</strong>
+                <strong>Two-Factor Otentikasi</strong>
                 <small class="d-block text-muted ml-4">Verifikasi tambahan</small>
             </li>
             <li class="mb-2">

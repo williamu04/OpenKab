@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Pengaturan Two-Factor Authentication')
+@section('title', 'Pengaturan Two-Factor Otentikasi')
 
 @section('content_header')    
-    <h1>Pengaturan Two-Factor Authentication (2FA)</h1>       
+    <h1>Pengaturan Two-Factor Otentikasi (2FA)</h1>       
 @stop
 
 @section('content')
@@ -15,12 +15,12 @@
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title">
                             <i class="fas fa-shield-alt mr-2"></i>
-                            Aktivasi Two-Factor Authentication
+                            Aktivasi Two-Factor Otentikasi
                         </h3>
                     </div>
                     <div class="card-body">
                         <div class="alert alert-info">
-                            <h6><i class="fas fa-info-circle mr-2"></i> Tentang Two-Factor Authentication (2FA)</h6>
+                            <h6><i class="fas fa-info-circle mr-2"></i> Tentang Two-Factor Otentikasi (2FA)</h6>
                             <p class="mb-0">2FA menambahkan lapisan keamanan ekstra ke akun Anda. Setelah login dengan password atau OTP, Anda akan diminta untuk memasukkan kode verifikasi sekali pakai yang dikirim ke channel yang Anda pilih.</p>
                         </div>
                         
@@ -94,15 +94,15 @@
                                     <div class="row text-sm">
                                         <div class="col-md-4">
                                             <i class="fas fa-check text-success mr-2"></i>
-                                            <strong>Password Authentication</strong>
+                                            <strong>Password Otentikasi</strong>
                                         </div>
                                         <div class="col-md-4">
                                             <i class="fas fa-check text-success mr-2"></i>
-                                            <strong>OTP Authentication</strong>
+                                            <strong>OTP Otentikasi</strong>
                                         </div>
                                         <div class="col-md-4">
                                             <i class="fas fa-check text-success mr-2"></i>
-                                            <strong>Two-Factor Authentication</strong>
+                                            <strong>2FA Otentikasi</strong>
                                         </div>
                                     </div>
                                 </div>
