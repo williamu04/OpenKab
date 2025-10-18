@@ -34,15 +34,41 @@ class DownloadControllerCmsTest extends BaseTestCase
     public function file_download_baru_dapat_disimpan()
     {
         Storage::fake('public');
-        $file = UploadedFile::fake()->create('contoh.pdf', 100, 'application/pdf');
+        
+        // Create a simple valid PDF content
+        $pdfContent = '%PDF-1.4
+%����
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Resources<<>>>>endobj
+xref
+0 4
+0000000000 65535 f
+0000000015 00000 n
+0000000061 00000 n
+0000000111 00000 n
+trailer<</Size 4/Root 1 0 R>>
+startxref
+178
+%%EOF';
+        
+        $tempFile = tempnam(sys_get_temp_dir(), 'test_pdf_');
+        file_put_contents($tempFile, $pdfContent);
+        
+        $file = new UploadedFile(
+            $tempFile,
+            'contoh.pdf',
+            'application/pdf',
+            UPLOAD_ERR_OK,
+            true
+        );
+        
         $data = [
             'title' => 'File PDF',
-            'state' => 1,
+            'state' => true,
             'description' => 'Contoh file yang dapat diunduh.',
             'download_file' => $file,
         ];
-
-        Storage::disk('public')->put('downloads', $file);
 
         $response = $this->post(route('downloads.store'), $data);
 
