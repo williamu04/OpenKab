@@ -22,8 +22,7 @@ class TwoFactorEnableRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'channel' => 'required|in:email,telegram',
-            'identifier' => 'required|string',
+            'channel' => 'required|in:email,telegram',            
         ];
     }
 

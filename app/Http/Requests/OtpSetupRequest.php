@@ -24,16 +24,8 @@ class OtpSetupRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'channel' => 'required|in:email,telegram',
-            'identifier' => 'required|string|max:255',
-        ];
-
-        // Validasi khusus berdasarkan channel
-        if ($this->input('channel') === 'email') {
-            $rules['identifier'] = 'required|email|max:255';
-        } elseif ($this->input('channel') === 'telegram') {
-            $rules['identifier'] = 'required|string|max:255|regex:/^[0-9]+$/';
-        }
+            'channel' => 'required|in:email,telegram',            
+        ];        
 
         return $rules;
     }
@@ -47,12 +39,7 @@ class OtpSetupRequest extends FormRequest
     {
         return [
             'channel.required' => 'Channel pengiriman wajib dipilih',
-            'channel.in' => 'Channel harus email atau telegram',
-            'identifier.required' => 'Identifier wajib diisi',
-            'identifier.string' => 'Identifier harus berupa teks',
-            'identifier.max' => 'Identifier maksimal 255 karakter',
-            'identifier.email' => 'Format email tidak valid',
-            'identifier.regex' => 'Telegram Chat ID harus berupa angka',
+            'channel.in' => 'Channel harus email atau telegram',            
         ];
     }
 

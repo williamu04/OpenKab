@@ -55,7 +55,8 @@ class OtpLoginController extends Controller
         $user = User::where('otp_enabled', true)
             ->where(function($query) use ($request) {
                 $query->where('otp_identifier', $request->identifier)
-                      ->orWhere('telegram_chat_id', $request->identifier);
+                    ->orWhere('email', $request->identifier)
+                      ->orWhere('username', $request->identifier);
             })
             ->first();
 
@@ -70,7 +71,7 @@ class OtpLoginController extends Controller
         $channels = $user->getOtpChannels();
         $channel = $channels[0] ?? 'email'; // Ambil channel pertama
         
-        $identifier = $request->identifier;
+        $identifier = $user->otp_identifier;
 
         $result = $this->otpService->generateAndSend($user->id, $channel, $identifier);
 
@@ -125,13 +126,6 @@ class OtpLoginController extends Controller
             
             // Check if user has 2FA enabled
             if ($this->twoFactorService->hasTwoFactorEnabled($user)) {
-                // Send OTP for 2FA verification
-                $channels = $this->twoFactorService->getTwoFactorChannels($user);
-                $channel = $channels[0] ?? 'email';
-                $identifier = $this->twoFactorService->getTwoFactorIdentifier($user);
-                
-                $this->otpService->generateAndSend($user->id, $channel, $identifier);
-                
                 // Clear 2FA verification session to require new verification
                 session()->forget('2fa_verified');
                 

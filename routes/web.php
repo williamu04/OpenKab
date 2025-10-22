@@ -81,20 +81,23 @@ Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(f
         Route::resource('activities', RiwayatPenggunaController::class)->only(['index', 'show'])->middleware('easyauthorize:pengaturan-activities');
         Route::resource('settings', App\Http\Controllers\SettingController::class)->except(['show', 'create', 'delete'])->middleware('easyauthorize:pengaturan-settings');
         
-        // OTP Routes
-        Route::prefix('otp')->group(function () {            
+        // OTP & 2FA Routes - combined into one page
+        Route::prefix('otp')->group(function () {
             Route::get('/', [App\Http\Controllers\OtpController::class, 'index'])->name('otp.index');
+            Route::get('/activate', [App\Http\Controllers\OtpController::class, 'activate'])->name('otp.activate');
             Route::post('/setup', [App\Http\Controllers\OtpController::class, 'setup'])->name('otp.setup');
             Route::post('/verify-activation', [App\Http\Controllers\OtpController::class, 'verifyActivation'])->name('otp.verify-activation');
             Route::post('/resend', [App\Http\Controllers\OtpController::class, 'resend'])->name('otp.resend');
-            Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');
+            Route::post('/disable', [App\Http\Controllers\OtpController::class, 'disable'])->name('otp.disable');            
         });
-
-        // 2FA Routes
+        
+        // 2FA Routes - for API calls from the combined page
         Route::prefix('2fa')->group(function () {
-            Route::get('/', [App\Http\Controllers\TwoFactorController::class, 'index'])->name('2fa.index');            
-            Route::post('/enable', [App\Http\Controllers\TwoFactorController::class, 'enable'])->name('2fa.enable');
-            Route::get('/verify', [App\Http\Controllers\TwoFactorController::class, 'showVerifyForm'])->name('2fa.verify-form');
+            Route::get('/', function() {
+                return redirect()->route('otp.index');
+            })->name('2fa.index');
+            Route::get('/activate', [App\Http\Controllers\TwoFactorController::class, 'activate'])->name('2fa.activate');
+            Route::post('/enable', [App\Http\Controllers\TwoFactorController::class, 'enable'])->name('2fa.enable');            
             Route::post('/verify', [App\Http\Controllers\TwoFactorController::class, 'verifyEnable'])->name('2fa.verify');
             Route::post('/disable', [App\Http\Controllers\TwoFactorController::class, 'disable'])->name('2fa.disable');
             Route::post('/resend', [App\Http\Controllers\TwoFactorController::class, 'resend'])->name('2fa.resend');

@@ -1,13 +1,13 @@
-<!-- Card Informasi -->
-<div class="card" id="infoCard">
+<!-- Information Cards -->
+<div class="card">
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-info-circle mr-2"></i>
-            Tentang 2FA
+            Tentang Keamanan Akun
         </h3>
     </div>
     <div class="card-body">
-        <h6><strong>Keunggulan 2FA:</strong></h6>
+        <h6><strong>Keunggulan Keamanan:</strong></h6>
         <ul class="text-sm">
             <li>🔒 Lapisan keamanan tambahan</li>
             <li>🛡️ Perlindungan dari akses tidak sah</li>
@@ -24,7 +24,6 @@
                     <strong>Email</strong>
                     <small class="text-muted d-block">Akses universal</small>
                 </div>
-            </div>
             <div class="d-flex align-items-center">
                 <i class="fab fa-telegram text-info mr-2"></i>
                 <div>
@@ -37,27 +36,26 @@
         <div class="alert alert-warning mt-3">
             <small>
                 <i class="fas fa-exclamation-triangle mr-1"></i>
-                <strong>Penting:</strong> Setelah 2FA aktif, Anda akan diminta kode verifikasi setiap kali login.
+                <strong>Penting:</strong> 2FA aktif untuk semua metode login (password dan OTP).
             </small>
         </div>
     </div>
 </div>
 
-<!-- Card Bantuan -->
+<!-- Tips & Tricks -->
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-question-circle mr-2"></i>
-            Butuh Bantuan?
+            <i class="fas fa-lightbulb mr-2"></i>
+            Tips & Trik
         </h3>
     </div>
     <div class="card-body">
-        <p class="text-sm">Jika mengalami kesulitan dalam setup atau verifikasi 2FA:</p>
         <ul class="text-sm">
-            <li>Pastikan koneksi internet stabil</li>
-            <li>Cek folder spam untuk email verifikasi</li>
-            <li>Verifikasi Chat ID Telegram sudah benar</li>
-            <li>Hubungi administrator jika masalah berlanjut</li>
+            <li>Simpan identifier Anda dengan aman untuk recovery</li>
+            <li>Gunakan 2FA untuk keamanan maksimal</li>
+            <li>OTP memungkinkan login tanpa password</li>
+            <li>Verifikasi identitas ganda untuk perlindungan ekstra</li>
         </ul>
     </div>
 </div>

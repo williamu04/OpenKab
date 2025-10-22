@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OtpSetupRequest;
 use App\Http\Requests\OtpVerifyRequest;
 use App\Services\OtpService;
+use App\Services\TwoFactorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -12,25 +13,37 @@ use Illuminate\Support\Facades\RateLimiter;
 class OtpController extends Controller
 {
     protected $otpService;
+    protected $twoFactorService;
 
-    public function __construct(OtpService $otpService)
-    {        
+    public function __construct(OtpService $otpService, TwoFactorService $twoFactorService)
+    {
         $this->otpService = $otpService;
+        $this->twoFactorService = $twoFactorService;
     }
 
     /**
-     * Tampilkan halaman aktivasi OTP
+     * Tampilkan halaman aktivasi OTP & 2FA
      */
     public function index()
+    {
+        $user = Auth::user();        
+        $twoFactorStatus = $this->twoFactorService->getUserTwoFactorStatus($user);
+        
+        return view('admin.pengaturan.otp.index', compact('user', 'twoFactorStatus'));
+    }
+
+    public function activate()
     {
         $user = Auth::user();
         $otpConfig = [
             'expires_minutes' => config('app.otp_token_expires_minutes', 5),
             'resend_seconds' => config('app.otp_resend_decay_seconds', 30),
             'length' => config('app.otp_length', 6),
-        ];
-        return view('admin.pengaturan.otp.activate', compact('user', 'otpConfig'));
+        ];                
+        
+        return view('admin.pengaturan.otp.activation-form', compact('user', 'otpConfig'));
     }
+
 
     /**
      * Setup konfigurasi OTP untuk user
@@ -51,12 +64,12 @@ class OtpController extends Controller
         }
 
         RateLimiter::hit($key, $decaySeconds);
-
+        $identifier = $request->channel === 'email' ? Auth::user()->email : Auth::user()->telegram_chat_id;
         // Simpan konfigurasi sementara di session (hanya jika session tersedia)
         if ($request->hasSession()) {
             $request->session()->put('temp_otp_config', [
                 'channel' => $request->channel,
-                'identifier' => $request->identifier,
+                'identifier' => $identifier,
             ]);
         }
 
@@ -64,7 +77,7 @@ class OtpController extends Controller
         $result = $this->otpService->generateAndSend(
             Auth::id(),
             $request->channel,
-            $request->identifier
+            $identifier
         );
 
         if ($result['success']) {
@@ -194,7 +207,7 @@ class OtpController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Sesi aktivasi tidak ditemukan.'
-            ], 400);
+            ], 40);
         }
 
         // Rate limiting untuk resend
@@ -218,5 +231,18 @@ class OtpController extends Controller
         );
 
         return response()->json($result, $result['success'] ? 200 : 400);
+    }
+    
+    /**
+     * Nonaktifkan 2FA dari controller ini untuk konsistensi
+     */
+    public function disable2fa(Request $request)
+    {
+        $result = $this->twoFactorService->disableTwoFactor(Auth::user());
+
+        return response()->json([
+            'success' => $result,
+            'message' => $result ? '2FA berhasil dinonaktifkan' : 'Gagal menonaktifkan 2FA'
+        ]);
     }
 }

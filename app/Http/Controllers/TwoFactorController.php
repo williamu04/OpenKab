@@ -19,18 +19,19 @@ class TwoFactorController extends Controller
     {
         $this->twoFactorService = $twoFactorService;
         $this->otpService = $otpService;
-    }
+    }    
 
-    /**
-     * Tampilkan halaman pengaturan 2FA
-     */
-    public function index()
+     public function activate()
     {
         $user = Auth::user();
-        $twoFactorStatus = $this->twoFactorService->getUserTwoFactorStatus($user);
+        $otpConfig = [
+            'expires_minutes' => config('app.otp_token_expires_minutes', 5),
+            'resend_seconds' => config('app.otp_resend_decay_seconds', 30),
+            'length' => config('app.otp_length', 6),
+        ];                
         
-        return view('admin.pengaturan.2fa.index', compact('user', 'twoFactorStatus'));
-    }   
+        return view('admin.pengaturan.2fa.activation-form', compact('user', 'otpConfig'));
+    }
 
     /**
      * Proses aktivasi 2FA
@@ -50,25 +51,24 @@ class TwoFactorController extends Controller
         }
 
         RateLimiter::hit($key, $decaySeconds);
-
+        $identifier = $request->channel === 'email' ? Auth::user()->email : Auth::user()->telegram_chat_id;
         // Simpan konfigurasi sementara di session
         $request->session()->put('temp_2fa_config', [
             'channel' => $request->channel,
-            'identifier' => $request->identifier,
+            'identifier' => $identifier,
         ]);
 
         // Kirim OTP untuk verifikasi
         $result = $this->otpService->generateAndSend(
             Auth::id(),
             $request->channel,
-            $request->identifier
+            $identifier
         );
 
         if ($result['success']) {
             return response()->json([
                 'success' => true,
-                'message' => 'Kode verifikasi telah dikirim untuk aktivasi 2FA',
-                'redirect' => route('2fa.verify-form')
+                'message' => 'Kode verifikasi telah dikirim untuk aktivasi 2FA'                
             ]);
         }
 
@@ -76,24 +76,7 @@ class TwoFactorController extends Controller
             'success' => false,
             'message' => $result['message']
         ], 400);
-    }
-
-    /**
-     * Tampilkan form verifikasi 2FA
-     */
-    public function showVerifyForm()
-    {
-        $user = Auth::user();
-        $tempConfig = session('temp_2fa_config');
-        
-        if (!$tempConfig) {
-            return redirect()->route('2fa.index')
-                ->with('error', 'Sesi aktivasi tidak ditemukan. Silakan mulai dari awal.');
-        }
-        
-        return view('admin.pengaturan.2fa.verify', compact('user', 'tempConfig'));
-    }
-
+    }    
     /**
      * Verifikasi dan konfirmasi aktivasi 2FA
      */

@@ -111,21 +111,7 @@ class LoginController extends Controller
                 session(['weak_password' => true]);
 
                 return redirect(route('password.change'))->with('success-login', 'Ganti password dengan yang lebih kuat');
-            }
-            
-            // Check if user has 2FA enabled
-            $user = $this->guard()->user();
-            if ($this->twoFactorService->hasTwoFactorEnabled($user)) {
-                // Send OTP for 2FA verification
-                $channels = $this->twoFactorService->getTwoFactorChannels($user);
-                $channel = $channels[0] ?? 'email';
-                $identifier = $this->twoFactorService->getTwoFactorIdentifier($user);
-                
-                $this->otpService->generateAndSend($user->id, $channel, $identifier);
-                
-                // Clear 2FA verification session to require new verification
-                session()->forget('2fa_verified');
-            }
+            }            
         }
 
         return $successLogin;
@@ -146,6 +132,7 @@ class LoginController extends Controller
         // Check if user has 2FA enabled
         $user = $this->guard()->user();
         if ($this->twoFactorService->hasTwoFactorEnabled($user)) {
+            session()->forget('2fa_verified');
             // If 2FA is enabled, redirect to 2FA challenge
             return redirect()->route('2fa.challenge');
         }
