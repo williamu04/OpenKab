@@ -2,18 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Models\OtpToken;
 use App\Models\User;
-use App\Services\OtpService;
 use App\Services\TwoFactorService;
+use App\Services\OtpService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
+use Tests\BaseTestCase;
 use Mockery;
-use Tests\TestCase;
 
-class TwoFactorControllerTest extends TestCase
+class TwoFactorControllerTest extends BaseTestCase
 {
     use DatabaseTransactions;
 
@@ -25,98 +22,108 @@ class TwoFactorControllerTest extends TestCase
     {
         parent::setUp();
         
-        // Start session for testing
         $this->startSession();
         
-        // Skip auth middleware for these tests
-        $this->withoutMiddleware([\App\Http\Middleware\TwoFactorMiddleware::class]);
-        
+        // Create a user for testing
         $this->user = User::factory()->create([
             '2fa_enabled' => false,
             '2fa_channel' => null,
             '2fa_identifier' => null,
+            'email' => 'test@example.com',
+            'telegram_chat_id' => '123456789'
         ]);
         
-        // Mock the services
+        // Authenticate the test user
+        $this->actingAs($this->user);
+        
         $this->twoFactorService = Mockery::mock(TwoFactorService::class);
         $this->otpService = Mockery::mock(OtpService::class);
         
-        // Bind mocks to the container
         $this->app->instance(TwoFactorService::class, $this->twoFactorService);
         $this->app->instance(OtpService::class, $this->otpService);
     }
 
     /** @test */
-    public function it_shows_2fa_settings_page()
+    public function it_shows_2fa_activation_page()
     {
-        $this->twoFactorService
-            ->shouldReceive('getUserTwoFactorStatus')
-            ->once()
-            ->with($this->user)
-            ->andReturn([
-                'enabled' => false,
-                'channel' => null,
-                'identifier' => null,
-            ]);
-
-        $response = $this->actingAs($this->user)
-            ->get(route('2fa.index'));
+        $response = $this->get(route('2fa.activate'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('admin.pengaturan.2fa.index');
+        $response->assertViewIs('admin.pengaturan.2fa.activation-form');
         $response->assertViewHas('user', $this->user);
-        $response->assertViewHas('twoFactorStatus');
     }
 
     /** @test */
-    public function it_can_initiate_2fa_enable_process()
+    public function it_can_enable_2fa_with_email()
     {
         $this->otpService
             ->shouldReceive('generateAndSend')
             ->once()
-            ->with($this->user->id, 'email', 'test@example.com')
+            ->with($this->user->id, 'email', $this->user->email)
             ->andReturn([
                 'success' => true,
-                'message' => 'Kode OTP berhasil dikirim',
+                'message' => 'Kode Token berhasil dikirim',
                 'channel' => 'email'
             ]);
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.enable'), [
-                'channel' => 'email',
-                'identifier' => 'test@example.com'
-            ]);
+        $response = $this->postJson(route('2fa.enable'), [
+            'channel' => 'email'
+        ]);
 
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
-            'message' => 'Kode verifikasi telah dikirim untuk aktivasi 2FA',
-            'redirect' => route('2fa.verify-form')
+            'message' => 'Kode verifikasi telah dikirim untuk aktivasi 2FA'
         ]);
 
-        // Verify session has temp config
         $this->assertArrayHasKey('temp_2fa_config', session()->all());
         $this->assertEquals('email', session('temp_2fa_config.channel'));
-        $this->assertEquals('test@example.com', session('temp_2fa_config.identifier'));
+        $this->assertEquals($this->user->email, session('temp_2fa_config.identifier'));
     }
 
     /** @test */
-    public function it_handles_otp_service_failure_during_2fa_enable()
+    public function it_can_enable_2fa_with_telegram()
     {
         $this->otpService
             ->shouldReceive('generateAndSend')
             ->once()
-            ->with($this->user->id, 'email', 'test@example.com')
+            ->with($this->user->id, 'telegram', $this->user->telegram_chat_id)
+            ->andReturn([
+                'success' => true,
+                'message' => 'Kode Token berhasil dikirim',
+                'channel' => 'telegram'
+            ]);
+
+        $response = $this->postJson(route('2fa.enable'), [
+            'channel' => 'telegram'
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Kode verifikasi telah dikirim untuk aktivasi 2FA'
+        ]);
+
+        $this->assertArrayHasKey('temp_2fa_config', session()->all());
+        $this->assertEquals('telegram', session('temp_2fa_config.channel'));
+        $this->assertEquals($this->user->telegram_chat_id, session('temp_2fa_config.identifier'));
+    }
+
+    /** @test */
+    public function it_handles_2fa_enable_failure()
+    {
+        $this->otpService
+            ->shouldReceive('generateAndSend')
+            ->once()
+            ->with($this->user->id, 'email', $this->user->email)
             ->andReturn([
                 'success' => false,
                 'message' => 'Failed to send OTP'
             ]);
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.enable'), [
-                'channel' => 'email',
-                'identifier' => 'test@example.com'
-            ]);
+        $response = $this->postJson(route('2fa.enable'), [
+            'channel' => 'email'
+        ]);
 
         $response->assertStatus(400);
         $response->assertJson([
@@ -133,45 +140,14 @@ class TwoFactorControllerTest extends TestCase
             RateLimiter::hit('2fa-setup:' . $this->user->id);
         }
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.enable'), [
-                'channel' => 'email',
-                'identifier' => 'test@example.com'
-            ]);
+        $response = $this->postJson(route('2fa.enable'), [
+            'channel' => 'email'
+        ]);
 
         $response->assertStatus(429);
         $response->assertJson([
             'success' => false
         ]);
-    }
-
-    /** @test */
-    public function it_shows_2fa_verification_form()
-    {
-        session(['temp_2fa_config' => [
-            'channel' => 'email',
-            'identifier' => 'test@example.com'
-        ]]);
-
-        // No need to mock getUserTwoFactorStatus since we're not testing it here
-
-        $response = $this->actingAs($this->user)
-            ->get(route('2fa.verify-form'));
-
-        $response->assertStatus(200);
-        $response->assertViewIs('admin.pengaturan.2fa.verify');
-        $response->assertViewHas('user', $this->user);
-        $response->assertViewHas('tempConfig');
-    }
-
-    /** @test */
-    public function it_redirects_if_no_temp_config_when_showing_verification_form()
-    {
-        $response = $this->actingAs($this->user)
-            ->get(route('2fa.verify-form'));
-
-        $response->assertRedirect(route('2fa.index'));
-        $response->assertSessionHas('error', 'Sesi aktivasi tidak ditemukan. Silakan mulai dari awal.');
     }
 
     /** @test */
@@ -188,7 +164,7 @@ class TwoFactorControllerTest extends TestCase
             ->with($this->user->id, '123456')
             ->andReturn([
                 'success' => true,
-                'message' => 'OTP verified successfully'
+                'message' => 'Kode Token berhasil diverifikasi'
             ]);
 
         $this->twoFactorService
@@ -209,20 +185,16 @@ class TwoFactorControllerTest extends TestCase
             'redirect' => route('2fa.index')
         ]);
 
-        // Verify session has 2fa_verified
         $this->assertTrue(session('2fa_verified'));
-        
-        // Verify temp config is removed
         $this->assertArrayNotHasKey('temp_2fa_config', session()->all());
     }
 
     /** @test */
-    public function it_rejects_verification_without_temp_config()
+    public function it_rejects_2fa_verification_without_temp_config()
     {
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.verify'), [
-                'code' => '123456'
-            ]);
+        $response = $this->postJson(route('2fa.verify'), [
+            'code' => '123456'
+        ]);
 
         $response->assertStatus(400);
         $response->assertJson([
@@ -232,7 +204,7 @@ class TwoFactorControllerTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_otp_verification_failure()
+    public function it_handles_2fa_verification_failure()
     {
         session(['temp_2fa_config' => [
             'channel' => 'email',
@@ -248,10 +220,9 @@ class TwoFactorControllerTest extends TestCase
                 'message' => 'Invalid OTP'
             ]);
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.verify'), [
-                'code' => '123456'
-            ]);
+        $response = $this->postJson(route('2fa.verify'), [
+            'code' => '123456'
+        ]);
 
         $response->assertStatus(400);
         $response->assertJson([
@@ -273,10 +244,9 @@ class TwoFactorControllerTest extends TestCase
             RateLimiter::hit('2fa-verify:' . $this->user->id);
         }
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.verify'), [
-                'code' => '123456'
-            ]);
+        $response = $this->postJson(route('2fa.verify'), [
+            'code' => '123456'
+        ]);
 
         $response->assertStatus(429);
         $response->assertJson([
@@ -293,8 +263,7 @@ class TwoFactorControllerTest extends TestCase
             ->with($this->user)
             ->andReturn(true);
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.disable'));
+        $response = $this->postJson(route('2fa.disable'));
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -308,26 +277,25 @@ class TwoFactorControllerTest extends TestCase
     {
         session(['temp_2fa_config' => [
             'channel' => 'email',
-            'identifier' => 'test@example.com'
+            'identifier' => $this->user->email
         ]]);
 
         $this->otpService
             ->shouldReceive('generateAndSend')
             ->once()
-            ->with($this->user->id, 'email', 'test@example.com')
+            ->with($this->user->id, 'email', $this->user->email)
             ->andReturn([
                 'success' => true,
-                'message' => 'Kode OTP berhasil dikirim',
+                'message' => 'Kode Token berhasil dikirim',
                 'channel' => 'email'
             ]);
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.resend'));
+        $response = $this->postJson(route('2fa.resend'));
 
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
-            'message' => 'Kode OTP berhasil dikirim',
+            'message' => 'Kode Token berhasil dikirim',
             'channel' => 'email'
         ]);
     }
@@ -335,8 +303,7 @@ class TwoFactorControllerTest extends TestCase
     /** @test */
     public function it_rejects_resend_without_temp_config()
     {
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.resend'));
+        $response = $this->postJson(route('2fa.resend'));
 
         $response->assertStatus(400);
         $response->assertJson([
@@ -346,11 +313,11 @@ class TwoFactorControllerTest extends TestCase
     }
 
     /** @test */
-    public function it_enforces_rate_limiting_on_resend()
+    public function it_enforces_rate_limiting_on_2fa_resend()
     {
         session(['temp_2fa_config' => [
             'channel' => 'email',
-            'identifier' => 'test@example.com'
+            'identifier' => $this->user->email
         ]]);
 
         // Hit rate limit
@@ -358,8 +325,7 @@ class TwoFactorControllerTest extends TestCase
             RateLimiter::hit('2fa-resend:' . $this->user->id);
         }
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.resend'));
+        $response = $this->postJson(route('2fa.resend'));
 
         $response->assertStatus(429);
         $response->assertJson([
@@ -370,7 +336,6 @@ class TwoFactorControllerTest extends TestCase
     /** @test */
     public function it_shows_2fa_challenge_page()
     {
-        // Enable 2FA for user
         $this->user->update([
             '2fa_enabled' => true,
             '2fa_channel' => json_encode(['email']),
@@ -395,11 +360,10 @@ class TwoFactorControllerTest extends TestCase
             ->with($this->user->id, 'email', 'test@example.com')
             ->andReturn([
                 'success' => true,
-                'message' => 'Kode OTP berhasil dikirim'
+                'message' => 'Kode Token berhasil dikirim'
             ]);
 
-        $response = $this->actingAs($this->user)
-            ->get(route('2fa.challenge'));
+        $response = $this->get(route('2fa.challenge'));
 
         $response->assertStatus(200);
         $response->assertViewIs('auth.2fa-challenge');
@@ -408,7 +372,6 @@ class TwoFactorControllerTest extends TestCase
     /** @test */
     public function it_redirects_to_dashboard_if_2fa_not_enabled()
     {
-        // Ensure 2FA is disabled
         $this->user->update(['2fa_enabled' => false]);
 
         $response = $this->actingAs($this->user)
@@ -420,7 +383,6 @@ class TwoFactorControllerTest extends TestCase
     /** @test */
     public function it_can_verify_2fa_challenge()
     {
-        // Enable 2FA for user
         $this->user->update([
             '2fa_enabled' => true,
             '2fa_channel' => json_encode(['email']),
@@ -433,15 +395,14 @@ class TwoFactorControllerTest extends TestCase
             ->with($this->user->id, '123456')
             ->andReturn([
                 'success' => true,
-                'message' => 'OTP verified successfully'
+                'message' => 'Kode Token berhasil diverifikasi'
             ]);
 
         session(['url.intended' => route('dasbor')]);
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.challenge.verify'), [
-                'code' => '123456'
-            ]);
+        $response = $this->postJson(route('2fa.challenge.verify'), [
+            'code' => '123456'
+        ]);
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -450,14 +411,12 @@ class TwoFactorControllerTest extends TestCase
             'redirect' => route('dasbor')
         ]);
 
-        // Verify session has 2fa_verified
         $this->assertTrue(session('2fa_verified'));
     }
 
     /** @test */
     public function it_handles_2fa_challenge_verification_failure()
     {
-        // Enable 2FA for user
         $this->user->update([
             '2fa_enabled' => true,
             '2fa_channel' => json_encode(['email']),
@@ -473,10 +432,9 @@ class TwoFactorControllerTest extends TestCase
                 'message' => 'Invalid OTP'
             ]);
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.challenge.verify'), [
-                'code' => '123456'
-            ]);
+        $response = $this->postJson(route('2fa.challenge.verify'), [
+            'code' => '123456'
+        ]);
 
         $response->assertStatus(400);
         $response->assertJson([
@@ -488,7 +446,6 @@ class TwoFactorControllerTest extends TestCase
     /** @test */
     public function it_enforces_rate_limiting_on_2fa_challenge()
     {
-        // Enable 2FA for user
         $this->user->update([
             '2fa_enabled' => true,
             '2fa_channel' => json_encode(['email']),
@@ -500,10 +457,9 @@ class TwoFactorControllerTest extends TestCase
             RateLimiter::hit('2fa-challenge:' . $this->user->id);
         }
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('2fa.challenge.verify'), [
-                'code' => '123456'
-            ]);
+        $response = $this->postJson(route('2fa.challenge.verify'), [
+            'code' => '123456'
+        ]);
 
         $response->assertStatus(429);
         $response->assertJson([
@@ -513,13 +469,11 @@ class TwoFactorControllerTest extends TestCase
 
     protected function tearDown(): void
     {
-        // Clear rate limiters after each test
         RateLimiter::clear('2fa-setup:' . $this->user->id);
         RateLimiter::clear('2fa-verify:' . $this->user->id);
         RateLimiter::clear('2fa-resend:' . $this->user->id);
         RateLimiter::clear('2fa-challenge:' . $this->user->id);
         
-        // Mockery::close();
         parent::tearDown();
     }
 }

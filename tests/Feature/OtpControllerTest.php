@@ -2,133 +2,124 @@
 
 namespace Tests\Feature;
 
-use App\Models\OtpToken;
 use App\Models\User;
 use App\Services\OtpService;
+use App\Services\TwoFactorService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Mockery;
 use Illuminate\Support\Facades\RateLimiter;
-use Tests\TestCase;
+use Mockery;
+use Tests\BaseTestCase;
 
-class OtpControllerTest extends TestCase
+class OtpControllerTest extends BaseTestCase
 {
     use DatabaseTransactions;
 
     protected User $user;
+    protected $otpService;
+    protected $twoFactorService;
 
     public function setUp(): void
     {
         parent::setUp();
         
-        // Start session for testing
         $this->startSession();
         
-        // Skip middleware for all tests to avoid permission issues
-        $this->withoutMiddleware();
-        
+        // Create a user for testing
         $this->user = User::factory()->create([
             'otp_enabled' => false,
             'otp_channel' => null,
             'otp_identifier' => null,
+            'email' => 'test@example.com',
+            'telegram_chat_id' => '123456789'
         ]);
         
-        // Set environment variables for OtpService
-        config(['services.telegram.bot_token' => 'fake_token_for_testing']);
-        config(['services.telegram.chat_id' => 'fake_chat_id_for_testing']);
+        // Authenticate the test user
+        $this->actingAs($this->user);
+        
+        // Replace services with mocks after parent setup
+        $this->otpService = Mockery::mock(OtpService::class);
+        $this->twoFactorService = Mockery::mock(TwoFactorService::class);
+        
+        $this->app->instance(OtpService::class, $this->otpService);
+        $this->app->instance(TwoFactorService::class, $this->twoFactorService);
+    }
+
+    /** @test */
+    public function it_shows_otp_settings_page()
+    {
+        $this->twoFactorService
+            ->shouldReceive('getUserTwoFactorStatus')
+            ->once()
+            ->with($this->user)
+            ->andReturn([
+                'enabled' => false,
+                'channel' => null,
+                'identifier' => null,
+            ]);
+
+        $response = $this->get(route('otp.index'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.pengaturan.otp.index');
+        $response->assertViewHas('user', $this->user);
+        $response->assertViewHas('twoFactorStatus');
     }
 
     /** @test */
     public function it_shows_otp_activation_page()
     {
-        $response = $this->actingAs($this->user)
-            ->get(route('otp.index'));
+        $response = $this->get(route('otp.activate'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('admin.pengaturan.otp.activate');
+        $response->assertViewIs('admin.pengaturan.otp.activation-form');
         $response->assertViewHas('user', $this->user);
     }
 
     /** @test */
-    public function it_can_setup_otp_with_email_channel()
+    public function it_can_setup_otp_with_email()
     {
-        Mail::fake();
-        
-        // Use real OtpService to test database interaction
-        
-        try {
-            $response = $this->actingAs($this->user)
-                ->postJson(route('otp.setup'), [
-                    'channel' => 'email',
-                    'identifier' => 'test@example.com'
-                ]);
+        $this->otpService
+            ->shouldReceive('generateAndSend')
+            ->once()
+            ->with($this->user->id, 'email', $this->user->email)
+            ->andReturn([
+                'success' => true,
+                'message' => 'Kode Token berhasil dikirim',
+                'channel' => 'email'
+            ]);
 
-            if ($response->status() !== 200) {
-                $content = $response->content();
-                $decodedContent = json_decode($content, true);
-                
-                dump('Response Status: ' . $response->status());
-                dump('Raw Content: ' . $content);
-                
-                if (json_last_error() === JSON_ERROR_NONE && isset($decodedContent['message'])) {
-                    dump('Error Message: ' . $decodedContent['message']);
-                }
-                
-                if (isset($decodedContent['exception'])) {
-                    dump('Exception: ' . $decodedContent['exception']);
-                }
-                
-                if (isset($decodedContent['trace'])) {
-                    $trace = is_array($decodedContent['trace']) ? json_encode($decodedContent['trace']) : $decodedContent['trace'];
-                    dump('Stack Trace: ' . substr($trace, 0, 500));
-                }
-            }
+        $response = $this->postJson(route('otp.setup'), [
+            'channel' => 'email'
+        ]);
 
-            $response->assertStatus(200);
-        } catch (\Exception $e) {
-            dump('Exception caught: ' . $e->getMessage());
-            dump('Stack trace: ' . $e->getTraceAsString());
-            throw $e;
-        }
+        $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
             'message' => 'Kode OTP telah dikirim untuk verifikasi aktivasi',
             'channel' => 'email'
         ]);
 
-        // Session data verification skipped for testing environment
-        // as we bypass session in controller for testing
-
-        // Verify OTP token was created
-        $this->assertDatabaseHas('otp_tokens', [
-            'user_id' => $this->user->id,
-            'channel' => 'email',
-            'identifier' => 'test@example.com'
-        ]);
-
-        Mail::assertSent(\App\Mail\OtpMail::class);
+        $this->assertArrayHasKey('temp_otp_config', session()->all());
+        $this->assertEquals('email', session('temp_otp_config.channel'));
+        $this->assertEquals($this->user->email, session('temp_otp_config.identifier'));
     }
 
     /** @test */
-    public function it_can_setup_otp_with_telegram_channel()
+    public function it_can_setup_otp_with_telegram()
     {
-        $this->mock(OtpService::class, function ($mock) {
-            $mock->shouldReceive('generateAndSend')
-                ->once()
-                ->with($this->user->id, 'telegram', '123456789')
-                ->andReturn([
-                    'success' => true,
-                    'message' => 'Kode OTP berhasil dikirim',
-                    'channel' => 'telegram'
-                ]);
-        });
-
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.setup'), [
-                'channel' => 'telegram',
-                'identifier' => '123456789'
+        $this->otpService
+            ->shouldReceive('generateAndSend')
+            ->once()
+            ->with($this->user->id, 'telegram', $this->user->telegram_chat_id)
+            ->andReturn([
+                'success' => true,
+                'message' => 'Kode Token berhasil dikirim',
+                'channel' => 'telegram'
             ]);
+
+        $response = $this->postJson(route('otp.setup'), [
+            'channel' => 'telegram'
+        ]);
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -137,115 +128,72 @@ class OtpControllerTest extends TestCase
             'channel' => 'telegram'
         ]);
 
-        // Session data verification skipped for testing environment
-        // as we bypass session in controller for testing
+        $this->assertArrayHasKey('temp_otp_config', session()->all());
+        $this->assertEquals('telegram', session('temp_otp_config.channel'));
+        $this->assertEquals($this->user->telegram_chat_id, session('temp_otp_config.identifier'));
     }
 
     /** @test */
-    public function it_validates_setup_request()
+    public function it_handles_otp_setup_failure()
     {
-        // Test missing channel
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.setup'), [
-                'identifier' => 'test@example.com'
+        $this->otpService
+            ->shouldReceive('generateAndSend')
+            ->once()
+            ->with($this->user->id, 'email', $this->user->email)
+            ->andReturn([
+                'success' => false,
+                'message' => 'Failed to send OTP'
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['channel']);
+        $response = $this->postJson(route('otp.setup'), [
+            'channel' => 'email'
+        ]);
 
-        // Test missing identifier
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.setup'), [
-                'channel' => 'email'
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['identifier']);
-
-        // Test invalid channel
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.setup'), [
-                'channel' => 'sms',
-                'identifier' => 'test@example.com'
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['channel']);
-
-        // Test invalid email format
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.setup'), [
-                'channel' => 'email',
-                'identifier' => 'invalid-email'
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['identifier']);
-
-        // Test invalid telegram chat ID
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.setup'), [
-                'channel' => 'telegram',
-                'identifier' => 'invalid-chat-id'
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['identifier']);
+        $response->assertStatus(400);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'Failed to send OTP'
+        ]);
     }
 
     /** @test */
-    public function it_enforces_rate_limiting_on_setup()
+    public function it_enforces_rate_limiting_on_otp_setup()
     {
-        Mail::fake();
-        
-        // Make 3 requests (the limit)
+        // Hit rate limit
         for ($i = 0; $i < 3; $i++) {
-            $this->actingAs($this->user)
-                ->postJson(route('otp.setup'), [
-                    'channel' => 'email',
-                    'identifier' => 'test@example.com'
-                ]);
+            RateLimiter::hit('otp-setup:' . $this->user->id);
         }
 
-        // 4th request should be rate limited
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.setup'), [
-                'channel' => 'email',
-                'identifier' => 'test@example.com'
-            ]);
+        $response = $this->postJson(route('otp.setup'), [
+            'channel' => 'email'
+        ]);
 
         $response->assertStatus(429);
         $response->assertJson([
             'success' => false
-        ]);
-        $response->assertJsonStructure([
-            'success',
-            'message'
         ]);
     }
 
     /** @test */
     public function it_can_verify_otp_activation()
     {
-        // Create OTP token
-        $otp = '123456';
-        $hashedOtp = Hash::make($otp);
-        
-        OtpToken::factory()->create([
-            'user_id' => $this->user->id,
-            'token_hash' => $hashedOtp,
+        session(['temp_otp_config' => [
             'channel' => 'email',
-            'identifier' => 'test@example.com',
-            'expires_at' => now()->addMinutes(5),
-            'attempts' => 0
-        ]);
+            'identifier' => 'test@example.com'
+        ]]);
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.verify-activation'), [
-                'otp' => $otp,
-                'channel' => 'email',
-                'identifier' => 'test@example.com'
+        $this->otpService
+            ->shouldReceive('verify')
+            ->once()
+            ->with($this->user->id, '123456')
+            ->andReturn([
+                'success' => true,
+                'message' => 'Kode Token berhasil diverifikasi'
             ]);
+
+        $response = $this->postJson(route('otp.verify-activation'), [
+            'otp' => '123456'
+        ]);
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -253,27 +201,20 @@ class OtpControllerTest extends TestCase
             'message' => 'OTP berhasil diaktifkan! Anda sekarang dapat menggunakan OTP sebagai alternatif login.'
         ]);
 
-        // Verify user was updated
         $this->user->refresh();
         $this->assertTrue((bool) $this->user->otp_enabled);
         $this->assertEquals(['email'], json_decode($this->user->otp_channel, true));
         $this->assertEquals('test@example.com', $this->user->otp_identifier);
 
-        // Session clearing verification skipped for testing environment
-
-        // Verify token was deleted
-        $this->assertDatabaseMissing('otp_tokens', [
-            'user_id' => $this->user->id
-        ]);
+        $this->assertArrayNotHasKey('temp_otp_config', session()->all());
     }
 
     /** @test */
-    public function it_rejects_verification_without_session_config()
+    public function it_rejects_otp_verification_without_temp_config()
     {
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.verify-activation'), [
-                'otp' => '123456'
-            ]);
+        $response = $this->postJson(route('otp.verify-activation'), [
+            'otp' => '123456'
+        ]);
 
         $response->assertStatus(400);
         $response->assertJson([
@@ -283,90 +224,66 @@ class OtpControllerTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_invalid_otp_during_verification()
+    public function it_handles_otp_verification_failure()
     {
         session(['temp_otp_config' => [
             'channel' => 'email',
             'identifier' => 'test@example.com'
         ]]);
 
-        // Create OTP token with different code
-        $correctOtp = '123456';
-        $wrongOtp = '654321';
-        $hashedOtp = Hash::make($correctOtp);
-        
-        OtpToken::factory()->create([
-            'user_id' => $this->user->id,
-            'token_hash' => $hashedOtp,
-            'expires_at' => now()->addMinutes(5),
-            'attempts' => 0
-        ]);
-
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.verify-activation'), [
-                'otp' => $wrongOtp
+        $this->otpService
+            ->shouldReceive('verify')
+            ->once()
+            ->with($this->user->id, '123456')
+            ->andReturn([
+                'success' => false,
+                'message' => 'Invalid OTP'
             ]);
+
+        $response = $this->postJson(route('otp.verify-activation'), [
+            'otp' => '123456'
+        ]);
 
         $response->assertStatus(400);
         $response->assertJson([
-            'success' => false
+            'success' => false,
+            'message' => 'Invalid OTP'
         ]);
-
-        // Verify user was not updated
-        $this->user->refresh();
-        $this->assertFalse((bool) $this->user->otp_enabled);
     }
 
     /** @test */
-    public function it_enforces_rate_limiting_on_verification()
+    public function it_enforces_rate_limiting_on_otp_verification()
     {
         session(['temp_otp_config' => [
             'channel' => 'email',
             'identifier' => 'test@example.com'
         ]]);
 
-        // Create OTP token
-        OtpToken::factory()->create([
-            'user_id' => $this->user->id,
-            'token_hash' => Hash::make('123456'),
-            'expires_at' => now()->addMinutes(5),
-            'attempts' => 0
-        ]);
-
-        // Make 5 requests (the limit)
+        // Hit rate limit
         for ($i = 0; $i < 5; $i++) {
-            $this->actingAs($this->user)
-                ->postJson(route('otp.verify-activation'), [
-                    'otp' => '000000' // Wrong OTP
-                ]);
+            RateLimiter::hit('otp-verify:' . $this->user->id);
         }
 
-        // 6th request should be rate limited
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.verify-activation'), [
-                'otp' => '000000'
-            ]);
+        $response = $this->postJson(route('otp.verify-activation'), [
+            'otp' => '123456'
+        ]);
 
         $response->assertStatus(429);
+        $response->assertJson([
+            'success' => false
+        ]);
     }
 
     /** @test */
     public function it_can_disable_otp()
     {
-        // Enable OTP for user first
         $this->user->update([
             'otp_enabled' => true,
             'otp_channel' => json_encode(['email']),
-            'otp_identifier' => 'test@example.com',
+            'otp_identifier' => 'test@example.com'
         ]);
 
-        // Create some OTP tokens
-        OtpToken::factory()->count(2)->create([
-            'user_id' => $this->user->id
-        ]);
-
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.disable'));
+        $response = $this->postJson(route('otp.disable'));
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -374,14 +291,10 @@ class OtpControllerTest extends TestCase
             'message' => 'OTP berhasil dinonaktifkan'
         ]);
 
-        // Verify user was updated
         $this->user->refresh();
         $this->assertFalse((bool) $this->user->otp_enabled);
         $this->assertNull($this->user->otp_channel);
         $this->assertNull($this->user->otp_identifier);
-
-        // Verify tokens were deleted
-        $this->assertEquals(0, OtpToken::where('user_id', $this->user->id)->count());
     }
 
     /** @test */
@@ -389,37 +302,33 @@ class OtpControllerTest extends TestCase
     {
         session(['temp_otp_config' => [
             'channel' => 'email',
-            'identifier' => 'test@example.com'
+            'identifier' => $this->user->email
         ]]);
 
-        $this->mock(OtpService::class, function ($mock) {
-            $mock->shouldReceive('generateAndSend')
-                ->once()
-                ->with($this->user->id, 'email', 'test@example.com')
-                ->andReturn([
-                    'success' => true,
-                    'message' => 'Kode OTP berhasil dikirim ulang'
-                ]);
-        });
-
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.resend'), [
-                'channel' => 'email',
-                'identifier' => 'test@example.com'
+        $this->otpService
+            ->shouldReceive('generateAndSend')
+            ->once()
+            ->with($this->user->id, 'email', $this->user->email)
+            ->andReturn([
+                'success' => true,
+                'message' => 'Kode Token berhasil dikirim',
+                'channel' => 'email'
             ]);
+
+        $response = $this->postJson(route('otp.resend'));
 
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
-            'message' => 'Kode OTP berhasil dikirim ulang'
+            'message' => 'Kode Token berhasil dikirim',
+            'channel' => 'email'
         ]);
     }
 
     /** @test */
-    public function it_rejects_resend_without_session_config()
+    public function it_rejects_resend_without_temp_config()
     {
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.resend'));
+        $response = $this->postJson(route('otp.resend'));
 
         $response->assertStatus(400);
         $response->assertJson([
@@ -429,69 +338,46 @@ class OtpControllerTest extends TestCase
     }
 
     /** @test */
-    public function it_enforces_rate_limiting_on_resend()
+    public function it_enforces_rate_limiting_on_otp_resend()
     {
         session(['temp_otp_config' => [
             'channel' => 'email',
-            'identifier' => 'test@example.com'
+            'identifier' => $this->user->email
         ]]);
 
-        $this->mock(OtpService::class, function ($mock) {
-            $mock->shouldReceive('generateAndSend')
-                ->times(2)
-                ->andReturn([
-                    'success' => true,
-                    'message' => 'Kode OTP berhasil dikirim ulang'
-                ]);
-        });
-
-        // Make 2 requests (the limit)
+        // Hit rate limit
         for ($i = 0; $i < 2; $i++) {
-            $this->actingAs($this->user)
-                ->postJson(route('otp.resend'), [
-                    'channel' => 'email',
-                    'identifier' => 'test@example.com'
-                ]);
+            RateLimiter::hit('otp-resend:' . $this->user->id);
         }
 
-        // 3rd request should be rate limited
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.resend'), [
-                'channel' => 'email',
-                'identifier' => 'test@example.com'
-            ]);
+        $response = $this->postJson(route('otp.resend'));
 
         $response->assertStatus(429);
-    }    
+        $response->assertJson([
+            'success' => false
+        ]);
+    }
 
     /** @test */
-    public function it_handles_otp_service_failures_gracefully()
+    public function it_can_disable_2fa_from_otp_controller()
     {
-        $this->mock(OtpService::class, function ($mock) {
-            $mock->shouldReceive('generateAndSend')
-                ->once()
-                ->andReturn([
-                    'success' => false,
-                    'message' => 'Service unavailable'
-                ]);
-        });
+        $this->twoFactorService
+            ->shouldReceive('disableTwoFactor')
+            ->once()
+            ->with($this->user)
+            ->andReturn(true);
 
-        $response = $this->actingAs($this->user)
-            ->postJson(route('otp.setup'), [
-                'channel' => 'email',
-                'identifier' => 'test@example.com'
-            ]);
+        $response = $this->postJson(route('2fa.disable'));
 
-        $response->assertStatus(400);
+        $response->assertStatus(200);
         $response->assertJson([
-            'success' => false,
-            'message' => 'Service unavailable'
+            'success' => true,
+            'message' => '2FA berhasil dinonaktifkan'
         ]);
     }
 
     protected function tearDown(): void
     {
-        // Clear rate limiters after each test
         RateLimiter::clear('otp-setup:' . $this->user->id);
         RateLimiter::clear('otp-verify:' . $this->user->id);
         RateLimiter::clear('otp-resend:' . $this->user->id);

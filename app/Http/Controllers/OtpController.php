@@ -207,7 +207,7 @@ class OtpController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Sesi aktivasi tidak ditemukan.'
-            ], 40);
+            ], 400);
         }
 
         // Rate limiting untuk resend
