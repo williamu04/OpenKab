@@ -39,6 +39,13 @@ class User extends Authenticatable
         'phone',
         'foto',
         'kode_kabupaten',
+        'otp_enabled',
+        'otp_channel',
+        'otp_identifier',
+        'telegram_chat_id',
+        '2fa_enabled',
+        '2fa_channel',
+        '2fa_identifier',
     ];
 
     /**
@@ -56,6 +63,8 @@ class User extends Authenticatable
         'last_login' => 'datetime',
         'email_verified_at' => 'datetime',
         'tempat_dilahirkan' => Enums\StatusEnum::class,
+        '2fa_enabled' => 'boolean',
+        'otp_enabled' => 'boolean',
     ];
 
     public function teams()
@@ -184,5 +193,29 @@ class User extends Authenticatable
 
         // Fallback default
         return $query->whereRaw('1 = 0');
+    }
+
+    /**
+     * Relasi ke OTP Tokens
+     */
+    public function otpTokens()
+    {
+        return $this->hasMany(OtpToken::class);
+    }
+
+    /**
+     * Cek apakah user memiliki OTP aktif
+     */
+    public function hasOtpEnabled()
+    {
+        return $this->otp_enabled;
+    }
+
+    /**
+     * Get channel OTP yang aktif
+     */
+    public function getOtpChannels()
+    {
+        return $this->otp_channel ? json_decode($this->otp_channel, true) : [];
     }
 }
