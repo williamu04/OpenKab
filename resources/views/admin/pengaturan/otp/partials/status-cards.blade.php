@@ -40,22 +40,23 @@
                         <h6 class="text-primary"><i class="fas fa-id-card mr-2"></i>Identifier</h6>
                         <code class="bg-light p-2 rounded">{{ $user->otp_identifier }}</code>
                     </div>
-                    @endif
+                </div>
+                @endif
 
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            @if($user->hasOtpEnabled())
-                            <button type="button" class="btn btn-outline-warning" id="disableOtpBtn">
-                                <i class="fas fa-times-circle mr-2"></i>Non Aktifkan
-                            </button>
-                            @else
-                            <button type="button" class="btn btn-outline-primary" id="enableOtpBtn">
-                                <i class="fas fa-plus-circle mr-2"></i>Aktifkan OTP
-                            </button>
-                            @endif
-                        </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        @if($user->hasOtpEnabled())
+                        <button type="button" class="btn btn-outline-warning" id="disableOtpBtn">
+                            <i class="fas fa-times-circle mr-2"></i>Non Aktifkan
+                        </button>
+                        @else
+                        <button type="button" class="btn btn-outline-primary" id="enableOtpBtn">
+                            <i class="fas fa-plus-circle mr-2"></i>Aktifkan OTP
+                        </button>
+                        @endif
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -99,23 +100,24 @@
                         <h6 class="text-primary"><i class="fas fa-id-card mr-2"></i>Identifier</h6>
                         <code class="bg-light p-2 rounded">{{ $twoFactorStatus['identifier'] }}</code>
                     </div>
-                    @endif
+                </div>
+                @endif
 
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            @if($twoFactorStatus['enabled'])
-                            <button type="button" class="btn btn-outline-warning" id="disable2faBtn">
-                                <i class="fas fa-times-circle mr-2"></i>Non Aktifkan
-                            </button>
-                            @else
-                            <button type="button" class="btn btn-outline-primary" id="enable2faBtn">
-                                <i class="fas fa-plus-circle mr-2"></i>Aktifkan 2FA
-                            </button>
-                            @endif
-                        </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        @if($twoFactorStatus['enabled'])
+                        <button type="button" class="btn btn-outline-warning" id="disable2faBtn">
+                            <i class="fas fa-times-circle mr-2"></i>Non Aktifkan
+                        </button>
+                        @else
+                        <button type="button" class="btn btn-outline-primary" id="enable2faBtn">
+                            <i class="fas fa-plus-circle mr-2"></i>Aktifkan 2FA
+                        </button>
+                        @endif
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
-</div>    
+</div>
