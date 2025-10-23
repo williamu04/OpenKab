@@ -7,6 +7,7 @@ Di rilis ini, versi 2510.0.0 berisi penambahan dan perbaikan yang diminta penggu
 
 #### Perbaikan BUG
 
+1. [#836](https://github.com/OpenSID/OpenKab/issues/836) Perbaikan unit test.
 
 #### Perubahan Teknis
 
