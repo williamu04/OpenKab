@@ -47,6 +47,20 @@
     </div>
 </div>
 
+<div class="col">
+    <div class="mb-4">
+        <label for="telegram_chat_id">Id Telegram</label>
+        <input type="text" class="form-control @error('telegram_chat_id') is-invalid @enderror" name="telegram_chat_id"
+            value="{{ old('telegram_chat_id', $user->telegram_chat_id ?? '') }}">        
+        @error('telegram_chat_id')
+            <div class="text-danger">{{ $message }}</div>
+        @enderror
+        <small class="form-text text-muted">
+            Dapatkan Chat ID dengan mengirim pesan ke <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>
+        </small>
+    </div>
+</div>
+
 @if (!$user)
     <div class="col">
         <div class="mb-4">
@@ -82,7 +96,7 @@
     </div>
 </div>
 
-@if ($openkab_siapakai && auth()->user()->hasRole('administrator'))
+@if (($openkab_siapakai ??  false) && auth()->user()->hasRole('administrator'))
     <div class="col">
         <div class="mb-4">
             <label for="kode_kabupaten">Kabupaten<span class="text-danger">*</span></label>

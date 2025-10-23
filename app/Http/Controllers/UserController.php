@@ -127,8 +127,9 @@ class UserController extends Controller
                 'email' => $data['email'],
                 'company' => $data['company'],
                 'phone' => $data['phone'],
-                'password' => $data['password'],
+                'password' => $data['password'],                
                 'active' => 1,
+                'telegram_chat_id' => $data['telegram_chat_id'],
                 'kode_kabupaten' => $currentUser->getEffectiveKodeKabupaten($request->input('kode_kabupaten')),
             ];
 
@@ -228,6 +229,7 @@ class UserController extends Controller
                 'email' => $request->get('email'),
                 'company' => $request->get('company'),
                 'phone' => $request->get('phone'),
+                'telegram_chat_id' => $request->get('telegram_chat_id'),
                 'kode_kabupaten' => $currentUser->getEffectiveKodeKabupaten($request->input('kode_kabupaten')),
             ];
 

@@ -51,7 +51,7 @@ class EasyAuthorize
         $route = $request->route()->getName();
         $tmp = explode('.', $route);
         $arrLength = count($tmp);
-
+        
         $ability = $permission.'-'.$mapPermission[$tmp[$arrLength - 1]] ?? $tmp[$arrLength - 1];
 //        dd(Auth::user()->can($ability));
         $this->gate->authorize($ability);
