@@ -36,7 +36,7 @@ jobs:
           script: |
             set -euo pipefail
             cd ${{ secrets.CICD_SERVER_PATH }}
-            ansible-playbook -i inventories/production/inventory.yml playbooks/deploy-openkab-rilis.yml --extra-vars "release_tag=${{ github.event.release.tag_name }}"
+            ansible-playbook -i inventories/production/inventory.yml playbooks/deploy-openkab-rilis.yml --vault-password-file ~/.vault_pass.txt --extra-vars "release_tag=${{ github.event.release.tag_name }}"
 
   deploy-prerelease:
     # Hanya jalan kalau rilis dari branch master & prerelease = true,
@@ -62,4 +62,4 @@ jobs:
           script: |
             set -euo pipefail
             cd ${{ secrets.CICD_SERVER_PATH }}
-            ansible-playbook -i inventories/production/inventory.yml playbooks/deploy-openkab-rilis.yml --extra-vars "release_tag=${{ github.event.release.tag_name }}"
+            ansible-playbook -i inventories/production/inventory.yml playbooks/deploy-openkab-rilis.yml --vault-password-file ~/.vault_pass.txt --extra-vars "release_tag=${{ github.event.release.tag_name }}"
