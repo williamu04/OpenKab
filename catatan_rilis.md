@@ -1,10 +1,13 @@
-Di rilis ini, versi 2510.0.1 berisi penambahan dan perbaikan yang diminta pengguna.
+Di rilis ini, versi 2511.0.0 berisi penambahan dan perbaikan yang diminta pengguna.
 
 #### Penambahan Fitur
 
+1. [#827](https://github.com/OpenSID/OpenKab/issues/827) Penambahan Fitur Login OTP Passwordless dengan Pengaturan Awal via Email/Telegram sebagai Alternatif Autentikasi di OpenKab.
+2. [#829](https://github.com/OpenSID/OpenKab/issues/829) Penambahan 2FA keamaan login.
 
 #### Perbaikan BUG
 
+1. [#836](https://github.com/OpenSID/OpenKab/issues/836) Perbaikan unit test.
 
 #### Perubahan Teknis
 

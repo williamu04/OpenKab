@@ -51,6 +51,7 @@ class UserRequest extends FormRequest
             'group' => ' required|exists:App\Models\Team,id',
             'foto' => 'image|max:1024|mimes:png,jpg',
             'kode_kabupaten' => 'nullable',
+            'telegram_chat_id' => 'nullable'
         ];
     }
 }

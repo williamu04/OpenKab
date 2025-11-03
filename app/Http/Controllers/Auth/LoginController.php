@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
+use App\Services\OtpService;
+use App\Services\TwoFactorService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -14,6 +17,20 @@ class LoginController extends Controller
     protected $decayMinutes = 3;
 
     protected $maxAttempts = 5;
+    
+    protected $otpService;
+    protected $twoFactorService;
+
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(OtpService $otpService, TwoFactorService $twoFactorService)
+    {
+        $this->middleware('guest')->except('logout');
+        $this->otpService = $otpService;
+        $this->twoFactorService = $twoFactorService;
+        $this->username = $this->findUsername();
+    }
     /*
     |--------------------------------------------------------------------------
     | Login Controller
@@ -41,15 +58,6 @@ class LoginController extends Controller
      */
     protected $username;
 
-    /**
-     * Create a new controller instance.
-     */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
-
-        $this->username = $this->findUsername();
-    }
 
     /**
      * Get the login username to be used by the controller.
@@ -103,9 +111,37 @@ class LoginController extends Controller
                 session(['weak_password' => true]);
 
                 return redirect(route('password.change'))->with('success-login', 'Ganti password dengan yang lebih kuat');
-            }
+            }            
         }
 
         return $successLogin;
+    }
+    
+    /**
+     * Send the response after the user was authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    protected function sendLoginResponse(Request $request)
+    {
+        $request->session()->regenerate();
+        
+        $this->clearLoginAttempts($request);
+        
+        // Check if user has 2FA enabled
+        $user = $this->guard()->user();
+        if ($this->twoFactorService->hasTwoFactorEnabled($user)) {
+            session()->forget('2fa_verified');
+            // If 2FA is enabled, redirect to 2FA challenge
+            return redirect()->route('2fa.challenge');
+        }
+        
+        // If weak password, redirect to password change
+        if (session('weak_password')) {
+            return redirect(route('password.change'))->with('success-login', 'Ganti password dengan yang lebih kuat');
+        }
+
+        return redirect()->intended($this->redirectPath());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Http\Middleware\TwoFactorMiddleware;
 use App\Http\Middleware\VerifyCsrfToken;
 use App\Http\Transformers\IdentitasTransformer;
 use App\Http\Transformers\SettingTransformer;
@@ -20,7 +21,7 @@ class BaseTestCase extends TestCase
         parent::setUp();
         // get a random user to act as the admin role
         $user = User::first();
-        $this->actingAsAdmin($user)->withoutMiddleware(VerifyCsrfToken::class);
+        $this->actingAsAdmin($user)->withoutMiddleware([VerifyCsrfToken::class, TwoFactorMiddleware::class]);
         // set share view data
         $identitasAplikasi = fractal(
             Identitas::first(),
