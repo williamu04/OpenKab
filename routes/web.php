@@ -270,6 +270,11 @@ Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(f
     });
 
     Route::prefix('data-presisi')->group(function () {
+        Route::prefix('laporan')->group(function () {
+            Route::get('/', [App\Http\Controllers\DataPresisiLaporanController::class, 'index'])->name('laporan.data-presisi.index');
+        })
+        ->middleware(['permission:datapresisi-laporan-read']);
+
         Route::prefix('kesehatan')->group(function () {
             Route::get('/', [App\Http\Controllers\DataPresisiKesehatanController::class, 'index'])->name('data-pokok.data-presisi.index');
             Route::get('/detail', [App\Http\Controllers\DataPresisiKesehatanController::class, 'detail'])->name('data-pokok.data-presisi.detail');
