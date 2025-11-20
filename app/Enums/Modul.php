@@ -107,6 +107,18 @@ final class Modul extends Enum
             'submenu' => [
                 [
                     'icon' => 'far fa-fw fa-circle',
+                    'text' => 'Laporan',
+                    'url' => 'data-presisi/laporan',
+                    'permission' => 'datapresisi-laporan',
+                ],
+                [
+                    'icon' => 'far fa-fw fa-circle',
+                    'text' => 'Laporan Perdesa',
+                    'url' => 'data-presisi/laporan/perdesa',
+                    'permission' => 'datapresisi-laporan',
+                ],
+                [
+                    'icon' => 'far fa-fw fa-circle',
                     'text' => 'Data Presisi Pangan',
                     'url' => 'data-presisi/pangan',
                     'permission' => 'datapresisi-pangan',
