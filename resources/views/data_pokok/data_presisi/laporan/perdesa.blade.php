@@ -22,30 +22,10 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-sm-3">
-                            <label>{{ config('app.sebutanKab') }}</label>
-                            <select name="Filter Kabupaten" id="filter_kabupaten" class="form-control form-control-sm"
-                                title="Pilih {{ config('app.sebutanKab') }}">
-                                <option value="">Pilih {{ config('app.sebutanKab') }}</option>
-                            </select>
+                            <button id="cetak" type="button" class="btn btn-primary btn-sm mt-4" data-url="">
+                                <i class="fa fa-print"></i> Cetak
+                            </button>
                         </div>
-                        <div class="col-sm-3">
-                            <label>Kecamatan</label>
-                            <select name="Filter Kecamatan" id="filter_kecamatan" class="form-control form-control-sm"
-                                title="Pilih Kecamatan">
-                                <option value="">Pilih Kecamatan</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-3">
-                            <label>{{ config('app.sebutanDesa') }}</label>
-                            <select name="Filter Desa" id="filter_desa" class="form-control form-control-sm"
-                                title="Pilih {{ config('app.sebutanDesa') }}">
-                                <option value="">Pilih {{ config('app.sebutanDesa') }}</option>
-                            </select>
-                        </div>
-                        {{-- <div class="col-sm-3">
-                            <label>&nbsp;</label>
-                            <button id="bt_filter" class="btn btn-sm btn-primary btn-block">Tampilkan</button>
-                        </div> --}}
                     </div>
                 </div>
                 <div class="card-body">
@@ -76,113 +56,6 @@
             const header = @include('layouts.components.header_bearer_api_gabungan');
             var url = new URL("{{ config('app.databaseGabunganUrl') . '/api/v1/data-presisi/laporan-perdesa' }}");
 
-            let urlKabupaten =
-                "{{ config('app.databaseGabunganUrl') . '/api/v1/statistik-web/get-list-kabupaten' }}";
-            let urlKecamatan =
-                "{{ config('app.databaseGabunganUrl') . '/api/v1/statistik-web/get-list-kecamatan' }}";
-            let urlDesa = "{{ config('app.databaseGabunganUrl') . '/api/v1/statistik-web/get-list-desa' }}";
-
-            // Load Kabupaten list
-            $.get(urlKabupaten, {}, function(data) {
-                for (var i = 0; i < data.length; i++) {
-                    var newOption = new Option(data[i].nama_kabupaten, data[i].kode_kabupaten, false,
-                        false);
-                    $("#filter_kabupaten").append(newOption);
-                }
-
-                // Set default kabupaten dari session
-                var defaultKabupaten = "{{ session('kabupaten.kode_kabupaten') ?? '' }}";
-                if (defaultKabupaten) {
-                    $('#filter_kabupaten').val(defaultKabupaten).trigger('change');
-                }
-            }, 'json');
-
-            // Initialize Select2
-            $('#filter_kabupaten').select2({
-                placeholder: "Pilih {{ config('app.sebutanKab') }}",
-                allowClear: true,
-                width: '100%',
-            });
-
-            $('#filter_kecamatan').select2({
-                placeholder: "Pilih Kecamatan",
-                allowClear: true,
-                width: '100%',
-            });
-
-            $('#filter_desa').select2({
-                placeholder: "Pilih {{ config('app.sebutanDesa') }}",
-                allowClear: true,
-                width: '100%',
-            });
-
-            // Kabupaten change event
-            // Flag untuk mencegah reload saat cascading change
-            let preventReload = false;
-
-            $('#filter_kabupaten').on('change', function() {
-                let id = $(this).val();
-                preventReload = true;
-                $('#filter_kecamatan').empty().append(new Option("Pilih Kecamatan", "")).trigger("change");
-                $('#filter_desa').empty().append(new Option("Pilih {{ config('app.sebutanDesa') }}", ""))
-                    .trigger("change");
-                preventReload = false;
-                $('#filter_kecamatan').prop('disabled', true);
-
-                if (id) {
-                    $.ajax({
-                        url: urlKecamatan + '/' + id,
-                        type: 'GET',
-                        dataType: 'json',
-                    }).done(function(data) {
-                        for (var i = 0; i < data.length; i++) {
-                            var newOption = new Option(data[i].nama_kecamatan, data[i]
-                                .kode_kecamatan, false, false);
-                            $("#filter_kecamatan").append(newOption);
-                        }
-                        $('#filter_kecamatan').prop('disabled', false);
-
-                        // Set default kecamatan dari session
-                        var defaultKecamatan = "{{ session('kecamatan.kode_kecamatan') ?? '' }}";
-                        if (defaultKecamatan) {
-                            $('#filter_kecamatan').val(defaultKecamatan).trigger('change');
-                        }
-                    });
-                }
-            });
-
-            // Kecamatan change event
-            $('#filter_kecamatan').on('change', function() {
-                let id = $(this).val();
-                preventReload = true;
-                $('#filter_desa').empty().append(new Option("Pilih {{ config('app.sebutanDesa') }}", ""))
-                    .trigger("change");
-                preventReload = false;
-                $('#filter_desa').prop('disabled', true);
-
-                if (id) {
-                    $.ajax({
-                        url: urlDesa + '/' + id,
-                        type: 'GET',
-                        dataType: 'json',
-                    }).done(function(data) {
-                        for (var i = 0; i < data.length; i++) {
-                            var newOption = new Option(data[i].nama_desa, data[i].kode_desa, false,
-                                false);
-                            $("#filter_desa").append(newOption);
-                        }
-                        $('#filter_desa').prop('disabled', false);
-
-                        // Set default desa dari session
-                        var defaultDesa = "{{ session('desa.id') ?? '' }}";
-                        if (defaultDesa) {
-                            $('#filter_desa').val(defaultDesa);
-                        }
-                    });
-                }
-            });
-
-
             var laporanTable = $('#laporanTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -197,13 +70,10 @@
                             "page[size]": row.length,
                             "page[number]": (row.start / row.length) + 1,
                             "filter[search]": row.search.value,
-                            "filter[config_id]": $('#filter_desa').val() ||
-                                "{{ session('desa.id') ?? '' }}",
-                            "kode_kabupaten": $('#filter_kabupaten').val() ||
-                                "{{ session('kabupaten.kode_kabupaten') ?? '' }}",
-                            "kode_kecamatan": $('#filter_kecamatan').val() ||
-                                "{{ session('kecamatan.kode_kecamatan') ?? '' }}",
-                            "config_desa": $('#filter_desa').val() || "{{ session('desa.id') ?? '' }}",
+                            // "filter[config_id]": "{{ session('desa.id') ?? '' }}",
+                            "kode_kabupaten": "{{ session('kabupaten.kode_kabupaten') ?? '' }}",
+                            "kode_kecamatan": "{{ session('kecamatan.kode_kecamatan') ?? '' }}",
+                            "config_desa": "{{ session('desa.id') ?? '' }}",
                             "sort": row.order[0].dir === 'desc' ? '-nama_desa' : 'nama_desa'
                         };
                     },
@@ -244,11 +114,12 @@
                 ]
             });
 
-            // Auto reload hanya untuk filter desa (hanya saat user memilih manual)
-            $('#filter_desa').on('change', function() {
-                if (!preventReload && $(this).val()) {
-                    laporanTable.ajax.reload();
-                }
+            $('#cetak').on('click', function() {
+                let baseUrl = "{{ route('laporan.data-presisi.cetak-perdesa') }}";
+
+                let params = $('#laporanTable').DataTable().ajax.params(); // Get DataTables params
+                let queryString = new URLSearchParams(params).toString(); // Convert params to query string
+                window.open(`${baseUrl}?${queryString}`, '_blank'); // Open the URL with appended query
             });
         })
     </script>

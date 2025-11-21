@@ -272,7 +272,9 @@ Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(f
     Route::prefix('data-presisi')->group(function () {
         Route::prefix('laporan')->group(function () {
             Route::get('/', [App\Http\Controllers\DataPresisiLaporanController::class, 'index'])->name('laporan.data-presisi.index');
-            Route::get('/perdesa', [App\Http\Controllers\DataPresisiLaporanController::class, 'perdesa'])->name('laporan.data-presisi.perdesa');
+            Route::get('cetak', [App\Http\Controllers\DataPresisiLaporanController::class, 'cetak'])->name('laporan.data-presisi.cetak');
+                Route::get('/perdesa', [App\Http\Controllers\DataPresisiLaporanController::class, 'perdesa'])->name('laporan.data-presisi.perdesa');
+                Route::get('/cetak-perdesa', [App\Http\Controllers\DataPresisiLaporanController::class, 'cetakPerdesa'])->name('laporan.data-presisi.cetak-perdesa');
         })
         ->middleware(['permission:datapresisi-laporan-read']);
 

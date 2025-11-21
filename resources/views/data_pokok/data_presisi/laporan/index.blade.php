@@ -36,6 +36,11 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-sm-3">
+                            <button id="cetak" type="button" class="btn btn-primary btn-sm" data-url="">
+                                <i class="fa fa-print"></i> Cetak
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -155,6 +160,14 @@
             // Event listener for year filter change
             $('#filter-status').on('change', function() {
                 $('#laporanTable').DataTable().ajax.reload();
+            });
+
+            $('#cetak').on('click', function() {
+                let baseUrl = "{{ route('laporan.data-presisi.cetak') }}";
+
+                let params = $('#laporanTable').DataTable().ajax.params(); // Get DataTables params
+                let queryString = new URLSearchParams(params).toString(); // Convert params to query string
+                window.open(`${baseUrl}?${queryString}`, '_blank'); // Open the URL with appended query
             });
         })
     </script>
