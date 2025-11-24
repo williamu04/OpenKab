@@ -64,6 +64,7 @@
                                     <th>Adat</th>
                                     <th>Ketenagakerjaan</th>
                                     <th>Jumlah Penduduk</th>
+                                    <th>Jumlah Rumah Tangga</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -156,6 +157,10 @@
                     },
                     {
                         data: 'jumlah_penduduk',
+                        render: $.fn.dataTable.render.number('.', ',', 0, '')
+                    },
+                    {
+                        data: 'jumlah_rumah_tangga',
                         render: $.fn.dataTable.render.number('.', ',', 0, '')
                     }
                 ]
