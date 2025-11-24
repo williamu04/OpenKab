@@ -177,6 +177,18 @@ final class Modul extends Enum
                     'url' => 'data-presisi/adat',
                     'permission' => 'datapresisi-adat',
                 ],
+                [
+                    'icon' => 'far fa-fw fa-circle',
+                    'text' => 'Laporan Pengisian',
+                    'url' => 'data-presisi/laporan',
+                    'permission' => 'datapresisi-laporan',
+                ],
+                [
+                    'icon' => 'far fa-fw fa-circle',
+                    'text' => 'Laporan Pengisian Perdesa',
+                    'url' => 'data-presisi/laporan/perdesa',
+                    'permission' => 'datapresisi-laporan',
+                ],
             ],
         ],
         [
