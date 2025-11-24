@@ -34,8 +34,9 @@
                                     $currentYear = date('Y');
                                     $startYear = 2020;
                                 @endphp
-                                @for($year = $currentYear; $year >= $startYear; $year--)
-                                    <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>{{ $year }}</option>
+                                @for ($year = $currentYear; $year >= $startYear; $year--)
+                                    <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>
+                                        {{ $year }}</option>
                                 @endfor
                             </select>
                         </div>
@@ -75,7 +76,7 @@
         let data_grafik = [];
         document.addEventListener("DOMContentLoaded", function(event) {
             const header = @include('layouts.components.header_bearer_api_gabungan');
-            var url = new URL("{{ config('app.databaseGabunganUrl').'/api/v1/data-presisi/pangan/rtm' }}");
+            var url = new URL("{{ config('app.databaseGabunganUrl') . '/api/v1/data-presisi/pangan/rtm' }}");
             url.searchParams.set("kode_kabupaten", "{{ session('kabupaten.kode_kabupaten') ?? '' }}");
             url.searchParams.set("kode_kecamatan", "{{ session('kecamatan.kode_kecamatan') ?? '' }}");
             url.searchParams.set("kode_desa", "{{ session('desa.id') ?? '' }}");
@@ -90,7 +91,7 @@
                 },
                 ajax: {
                     url: url.href,
-                    headers: header,  
+                    headers: header,
                     method: 'get',
                     data: function(row) {
                         return {
@@ -104,29 +105,27 @@
                     },
                     dataSrc: function(json) {
                         if (json.data.length > 0) {
-                        json.recordsTotal = json.meta.pagination.total
-                        json.recordsFiltered = json.meta.pagination.total
-                        data_grafik = [];
-                        json.data.forEach(function(item, index) {
-                            data_grafik.push(item.attributes)
-                        })
-                        grafikPie()
-                        return json.data;
-                    }
-                    return false;
+                            json.recordsTotal = json.meta.pagination.total
+                            json.recordsFiltered = json.meta.pagination.total
+                            data_grafik = [];
+                            json.data.forEach(function(item, index) {
+                                data_grafik.push(item.attributes)
+                            })
+                            grafikPie()
+                            return json.data;
+                        }
+                        return false;
                     },
                 },
                 columnDefs: [{
-                        targets: '_all',
-                        className: 'text-nowrap',
-                    },
-                ],
-                columns: [
-                    {
+                    targets: '_all',
+                    className: 'text-nowrap',
+                }, ],
+                columns: [{
                         data: function(data) {
                             let d = data.attributes
                             let obj = {
-                                'rtm_id' : data.id,
+                                'rtm_id': data.id,
                                 'no_kartu_rumah': d.no_kk,
                                 'nama_kepala_keluarga': d.kepala_keluarga,
                                 'alamat': d.alamat,
@@ -134,7 +133,9 @@
                                 'jumlah_kk': d.jumlah_kk,
                             }
                             let jsonData = encodeURIComponent(JSON.stringify(obj));
-                            const _url =  "{{ route('data-pokok.data-presisi-pangan.detail', ['data' => '__DATA__']) }}".replace('__DATA__', jsonData)
+                            const _url =
+                                "{{ route('data-pokok.data-presisi-pangan.detail', ['data' => '__DATA__']) }}"
+                                .replace('__DATA__', jsonData)
                             return `<a href="${_url}" title="Detail" data-button="Detail">
                                 <button type="button" class="btn btn-info btn-sm">Detail</button>
                             </a>`;
@@ -166,11 +167,11 @@
                         data: "attributes.luas_lahan",
                         render: (data) => data || 'N/A',
                     },
-                    
+
                 ],
             })
             // Add event listener for opening and closing details
-            dtks.on('click', 'td.details-control', function () {
+            dtks.on('click', 'td.details-control', function() {
                 let tr = $(this).closest('tr');
                 let row = dtks.row(tr);
                 if (row.child.isShown()) {
@@ -183,6 +184,7 @@
                     tr.addClass('shown');
                 }
             });
+
             function format(data) {
                 return `
                     <table class="table table-striped">
@@ -267,7 +269,7 @@
                 data_grafik = [];
                 grafikPie();
             });
-            
+
             $('#cetak').on('click', function() {
                 let baseUrl = "{{ route('data-pokok.data-presisi-pangan.cetak') }}";
                 let params = dtks.ajax.params(); // Get DataTables params
