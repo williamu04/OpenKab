@@ -40,12 +40,7 @@
                                 <i class="fas fa-filter"></i>
                             </a>
                         </div>
-
-                        <div class="col-md-2">
-                            <button id="cetak" type="button" class="btn btn-primary btn-block btn-sm" data-url=""><i
-                                    class="fa fa-print"></i>
-                                Cetak</button>
-                        </div>
+                        
                         <div class="col-md-2">
                             <button type="button" id="export-excel" class="btn btn-info btn-block btn-sm">
                                 <i class="fa fa-file-excel"></i>
@@ -142,21 +137,13 @@
                     });
 
                     $('#daftar-statistik').html(html)
+                    $('#daftar-statistik').find('.pilih-kategori > a').eq(0).click();
                 }
             });
 
             $('#daftar-statistik').on('mouseenter', '.pilih-kategori > a', function() {
                 $(this).css('cursor', 'pointer')
-            });
-
-            $('#cetak').on('click', function() {
-                var id = $('#daftar-statistik .active').data('id');
-
-                let url = new URL(`{{ url('statistik/cetak') }}/${kategori}/${id}`);
-                url.searchParams.append("filter[tahun]", $("#tahun").val() ?? '');
-                url.searchParams.append("filter[bulan]", $("#bulan").val() ?? '');
-                window.open(url, '_blank');
-            });
+            });            
 
             // Helper function to create Excel export caption
             function createExportCaption(categoryName, options = {}) {
@@ -210,16 +197,7 @@
                 var bulan = $("#bulan").val();                
 
                 // Generate dynamic filename
-                var filename = `Statistik_${categoryName}_${nama_desa}`;
-                if (tahun) {
-                    filename += `_${tahun}`;
-                }
-                if (bulan) {
-                    const bulanNames = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-                    ];
-                    filename += `_${bulanNames[parseInt(bulan)]}`;
-                }
+                var filename = `Statistik_${categoryName}_${nama_desa}`;                
 
                 // Clean filename - remove special characters
                 filename = filename.replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -338,9 +316,7 @@
 
                 statistik.ajax.url(urlStatistik.href, {
                     headers: header,
-                }).load();
-
-                $('#cetak').data('url', `{{ url('statistik/cetak') }}/${kategori}/${id}`);
+                }).load();                
             });
             const urlDetailLink = `{{ $detailLink }}?kategori=${kategori}`;
             var urlStatistik = new URL(`${baseUrl}/data-presisi/sandang/statistik`);
@@ -454,10 +430,7 @@
             });
 
             $(document).on('click', '#reset', function(e) {
-                e.preventDefault();
-                $('#tahun').val('').change();
-                $('#bulan').val('').change();
-                $('#bulan').val('').change();
+                e.preventDefault();                
                 statistik.ajax.reload();
             });            
         });
