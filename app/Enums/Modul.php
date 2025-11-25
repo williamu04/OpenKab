@@ -123,6 +123,12 @@ final class Modul extends Enum
                             'text' => 'Sandang',
                             'url' => 'data-presisi/statistik/sandang',
                             'permission' => 'statistik-datapresisi-sandang',
+                        ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Papan',
+                            'url' => 'data-presisi/statistik/papan',
+                            'permission' => 'statistik-datapresisi-papan',
                         ]
                     ]
                 ],

@@ -314,6 +314,7 @@ Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(f
 
         Route::prefix('statistik')->group(function () {
             Route::get('sandang', [App\Http\Controllers\StatistikSandangController::class, 'index']); 
+            Route::get('papan', [App\Http\Controllers\StatistikPapanController::class, 'index']); 
         });
     });
 
