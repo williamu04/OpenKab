@@ -5,7 +5,7 @@
 @section('title', 'Data Statistik')
 
 @section('content_header')
-    <h1>Data Statistik {{ $judul }}</h1>
+    <h1>Data Statistik Seni Budaya</h1>
 @stop
 
 @section('content')
