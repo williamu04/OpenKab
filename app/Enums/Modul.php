@@ -152,7 +152,13 @@ final class Modul extends Enum
                             'text' => 'Jaminan Sosial',
                             'url' => 'data-presisi/statistik/jaminan-sosial',
                             'permission' => 'statistik-datapresisi-jaminan-sosial',
-                        ]
+                        ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Aktivitas Keagamaan',
+                            'url' => 'data-presisi/statistik/aktivitas-keagamaan',
+                            'permission' => 'statistik-datapresisi-aktivitas-keagamaan',
+                        ],
                     ]
                 ],
                 [
