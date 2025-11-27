@@ -165,6 +165,12 @@ final class Modul extends Enum
                             'url' => 'data-presisi/statistik/ketenagakerjaan',
                             'permission' => 'statistik-datapresisi-ketenagakerjaan',
                         ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Adat',
+                            'url' => 'data-presisi/statistik/adat',
+                            'permission' => 'statistik-datapresisi-adat',
+                        ]
                     ]
                 ],
                 [
