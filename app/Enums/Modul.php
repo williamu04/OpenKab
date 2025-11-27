@@ -110,7 +110,7 @@ final class Modul extends Enum
             'submenu' => [
                 [
                     'text' => 'Statistik',
-                    'icon' => 'fa fa-chart-pie',
+                    'icon' => 'fa fa-chart-pie',                    
                     'submenu' => [                        
                         [
                             'text' => 'Pangan',
@@ -131,9 +131,21 @@ final class Modul extends Enum
                         ],
                         [
                             'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Seni Budaya',
+                            'url' => 'data-presisi/statistik/senibudaya',
+                            'permission' => 'statistik-datapresisi-senibudaya',
+                        ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
                             'text' => 'Pendidikan',
                             'url' => 'data-presisi/statistik/pendidikan',
                             'permission' => 'statistik-datapresisi-pendidikan',
+                        ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Kesehatan',
+                            'url' => 'data-presisi/statistik/kesehatan',
+                            'permission' => 'statistik-datapresisi-kesehatan',
                         ],
                     ]
                 ],
