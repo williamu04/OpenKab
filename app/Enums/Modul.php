@@ -147,6 +147,12 @@ final class Modul extends Enum
                             'url' => 'data-presisi/statistik/kesehatan',
                             'permission' => 'statistik-datapresisi-kesehatan',
                         ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Jaminan Sosial',
+                            'url' => 'data-presisi/statistik/jaminan-sosial',
+                            'permission' => 'statistik-datapresisi-jaminan-sosial',
+                        ]
                     ]
                 ],
                 [
