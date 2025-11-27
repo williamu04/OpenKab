@@ -125,6 +125,18 @@ final class Modul extends Enum
                         ],
                         [
                             'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Papan',
+                            'url' => 'data-presisi/statistik/papan',
+                            'permission' => 'statistik-datapresisi-papan',
+                        ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Seni Budaya',
+                            'url' => 'data-presisi/statistik/senibudaya',
+                            'permission' => 'statistik-datapresisi-senibudaya',
+                        ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
                             'text' => 'Pendidikan',
                             'url' => 'data-presisi/statistik/pendidikan',
                             'permission' => 'statistik-datapresisi-pendidikan',

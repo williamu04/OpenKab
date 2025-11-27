@@ -324,6 +324,8 @@ Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(f
             Route::get('kesehatan', [App\Http\Controllers\StatistikKesehatanController::class, 'index']);
             Route::get('pendidikan', [App\Http\Controllers\StatistikPendidikanController::class, 'index']); 
             Route::get('sandang', [App\Http\Controllers\StatistikSandangController::class, 'index']); 
+            Route::get('papan', [App\Http\Controllers\StatistikPapanController::class, 'index']); 
+            Route::get('senibudaya', [App\Http\Controllers\StatistikSenibudayaController::class, 'index']); 
             Route::get('pangan', [App\Http\Controllers\StatistikPanganController::class, 'index']); 
         });
     });
