@@ -159,6 +159,12 @@ final class Modul extends Enum
                             'url' => 'data-presisi/statistik/aktivitas-keagamaan',
                             'permission' => 'statistik-datapresisi-aktivitas-keagamaan',
                         ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Ketenagakerjaan',
+                            'url' => 'data-presisi/statistik/ketenagakerjaan',
+                            'permission' => 'statistik-datapresisi-ketenagakerjaan',
+                        ],
                     ]
                 ],
                 [

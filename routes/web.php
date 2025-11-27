@@ -320,7 +320,7 @@ Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(f
         })
         ->middleware(['permission:datapresisi-adat-read']);
 
-        Route::prefix('statistik')->group(function () {
+        Route::prefix('statistik')->group(function () {            
             Route::get('kesehatan', [App\Http\Controllers\StatistikKesehatanController::class, 'index']);
             Route::get('jaminan-sosial', [App\Http\Controllers\StatistikJaminanSosialController::class, 'index']);
             Route::get('aktivitas-keagamaan', [App\Http\Controllers\StatistikAktivitasKeagamaanController::class, 'index']);
