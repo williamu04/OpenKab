@@ -111,9 +111,8 @@ final class Modul extends Enum
                 [
                     'text' => 'Statistik',
                     'icon' => 'fa fa-chart-pie',
-                    'submenu' => [
+                    'submenu' => [                        
                         [
-                            'icon' => 'far fa-fw fa-circle',
                             'text' => 'Pangan',
                             'url' => 'data-presisi/statistik/pangan',
                             'permission' => 'statistik-datapresisi-pangan',
@@ -123,7 +122,13 @@ final class Modul extends Enum
                             'text' => 'Sandang',
                             'url' => 'data-presisi/statistik/sandang',
                             'permission' => 'statistik-datapresisi-sandang',
-                        ]
+                        ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Pendidikan',
+                            'url' => 'data-presisi/statistik/pendidikan',
+                            'permission' => 'statistik-datapresisi-pendidikan',
+                        ],
                     ]
                 ],
                 [
