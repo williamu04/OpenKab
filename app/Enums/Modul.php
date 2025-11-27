@@ -110,10 +110,9 @@ final class Modul extends Enum
             'submenu' => [
                 [
                     'text' => 'Statistik',
-                    'icon' => 'fa fa-chart-pie',
-                    'submenu' => [
+                    'icon' => 'fa fa-chart-pie',                    
+                    'submenu' => [                        
                         [
-                            'icon' => 'far fa-fw fa-circle',
                             'text' => 'Pangan',
                             'url' => 'data-presisi/statistik/pangan',
                             'permission' => 'statistik-datapresisi-pangan',
@@ -135,7 +134,19 @@ final class Modul extends Enum
                             'text' => 'Seni Budaya',
                             'url' => 'data-presisi/statistik/senibudaya',
                             'permission' => 'statistik-datapresisi-senibudaya',
-                        ]
+                        ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Pendidikan',
+                            'url' => 'data-presisi/statistik/pendidikan',
+                            'permission' => 'statistik-datapresisi-pendidikan',
+                        ],
+                        [
+                            'icon' => 'far fa-fw fa-circle',
+                            'text' => 'Kesehatan',
+                            'url' => 'data-presisi/statistik/kesehatan',
+                            'permission' => 'statistik-datapresisi-kesehatan',
+                        ],
                     ]
                 ],
                 [
@@ -209,18 +220,6 @@ final class Modul extends Enum
                     'text' => 'Data Adat',
                     'url' => 'data-presisi/adat',
                     'permission' => 'datapresisi-adat',
-                ],
-                [
-                    'icon' => 'far fa-fw fa-circle',
-                    'text' => 'Laporan Pengisian',
-                    'url' => 'data-presisi/laporan',
-                    'permission' => 'datapresisi-laporan',
-                ],
-                [
-                    'icon' => 'far fa-fw fa-circle',
-                    'text' => 'Laporan Pengisian Perdesa',
-                    'url' => 'data-presisi/laporan/perdesa',
-                    'permission' => 'datapresisi-laporan',
                 ],
             ],
         ],
