@@ -13,8 +13,8 @@
                 @include('dasbor.filter')
                 @include('dasbor.summary')
             </div>
-        </div>
-        @include('dasbor.statistik_penduduk')
+        </div>        
+        {{-- @include('dasbor.statistik_penduduk') --}}
         @include('dasbor.peta')
         @include('dasbor.tabel_penduduk')
     </div>
@@ -29,7 +29,7 @@
 
             $('#bt_filter').click(function() {
                 $('#summary_block').trigger('change');
-                $('#statistik_penduduk_block').trigger('change');
+                //$('#statistik_penduduk_block').trigger('change');
                 $('#tabel_penduduk_block').trigger('change');
                 $('#map').trigger('change');
             });

@@ -12,7 +12,7 @@
             <div class="card-body">
                 @include('demografi.filter')
                 <div class="row">
-                    @include('demografi.statistik_penduduk')
+                    {{-- @include('demografi.statistik_penduduk') --}}
                 </div>
                 <div class="row">
                     @foreach ($chartItems as $chart)
@@ -33,7 +33,7 @@
 
             $('#bt_filter').click(function() {
                 $('.card-chart').trigger('change');
-                $('#statistik_penduduk_block').trigger('change');
+                //$('#statistik_penduduk_block').trigger('change');
             });
 
             $('.card-chart').change(function(event) {
