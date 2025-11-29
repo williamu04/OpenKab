@@ -19,3 +19,4 @@ Di rilis ini, versi 2511.0.0 berisi penambahan dan perbaikan yang diminta penggu
 
 #### Perubahan Teknis
 
+1 [#867](https://github.com/OpenSID/OpenKab/issues/867) Hapus statistik penduduk perbulan yang menyebabkan query lambat pada API Satu Data.
