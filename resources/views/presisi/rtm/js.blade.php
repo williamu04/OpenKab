@@ -144,7 +144,7 @@
                 $('#pie').append('<canvas id="donutChart"></canvas>');
                 tampilGrafik(data[0]);
                 tampilPie(data[1]);
-                $('#btn-pie').click();
+                $('#btn-grafik').click();
             }
 
             function tampilGrafik(areaChartData) {
