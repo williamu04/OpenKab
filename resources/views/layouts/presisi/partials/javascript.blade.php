@@ -14,8 +14,8 @@
 <script src="{{ asset('assets/js/adminlte.js') }}"></script>
 
 <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
-<script src="{{ asset('assets/plugins/chart.js/chart.js') }}"></script>
-<script src="{{ asset('assets/plugins/chart.js/chartjs-plugin-datalabels.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/chart.js/chart.umd.js') }}"></script>
+<script src="{{ asset('assets/plugins/chart.js/chartjs-plugin-datalabels.js') }}"></script>
 <script src="{{ asset('assets/costume/js/admin.js') }}"></script>
 
 <!-- Highcharts JS -->
