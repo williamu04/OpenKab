@@ -10,3 +10,4 @@ Di rilis ini, versi 2512.0.1 berisi penambahan dan perbaikan yang diminta penggu
 #### Perubahan Teknis
 
 1. [#869](https://github.com/OpenSID/OpenKab/issues/869) Upgrade versi moment pada chart.js serta perbaikan halaman website presisi untuk kependudukan dan RTM.
+2. [#876](https://github.com/OpenSID/OpenKab/issues/876) Ganti highchart dengan chartjs agar menggunakan satu library saja.
