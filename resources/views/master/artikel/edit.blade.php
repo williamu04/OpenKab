@@ -189,7 +189,10 @@
                         const result = await response.json();
 
                         if (response.ok && result.success && result.url) {
-                            return result.url;
+                            // Ensure the URL is absolute
+                            const baseUrl = '{{ url('/') }}';
+                            const fullUrl = result.url.startsWith('http') ? result.url : `${baseUrl}${result.url}`;
+                            return fullUrl;
                         }
 
                         throw new Error(result.message || 'Upload gagal');
