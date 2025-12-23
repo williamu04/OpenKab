@@ -6,6 +6,7 @@ Di rilis ini, versi 2512.0.1 berisi penambahan dan perbaikan yang diminta penggu
 #### Perbaikan BUG
 
 1. [#873](https://github.com/OpenSID/OpenKab/issues/873) Perbaikan menu laporan data presisi yang hilang.
+2. [#879](https://github.com/OpenSID/OpenKab/issues/879) Perbaikan filter tahun pada statistik kependudukan.
 
 #### Perubahan Teknis
 

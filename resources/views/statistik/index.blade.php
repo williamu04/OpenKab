@@ -37,12 +37,14 @@
             <div class="card card-outline card-primary">
                 <div class="card-header">
                     <div class="row">
+                        @if(isset($filter_tahun) && $filter_tahun)
                         <div class="col-auto">
                             <a class="btn btn-sm btn-secondary" data-toggle="collapse" href="#collapse-filter"
                                 role="button" aria-expanded="true" aria-controls="collapse-filter">
                                 <i class="fas fa-filter"></i>
                             </a>
                         </div>
+                        @endif
 
                         <div class="col-md-2">
                             <button id="cetak" type="button" class="btn btn-primary btn-block btn-sm" data-url=""><i
@@ -71,8 +73,8 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    @if(isset($filter_tahun) && $filter_tahun)
                     <div class="row">
-
                         <div class="col-md-12">
                             <div id="collapse-filter" class="collapse">
                                 <div class="row">
@@ -82,20 +84,17 @@
                                             <select class="form-control" id="tahun"></select>
                                         </div>
                                     </div>
-
                                     <div class="col-sm">
                                         <div class="form-group">
                                             <label>Bulan</label>
                                             <select class="form-control" id="bulan">
                                                 <option value=""></option>
-                                                @for ($x = 1; $x <= 12; $x++)
-                                                    <option value="{{ $x }}">{{ bulan($x) }}</option>
+                                                @for ($x = 1; $x <= 12; $x++) 
+                                                <option value="{{ $x }}">{{ bulan($x) }}</option>
                                                 @endfor
                                             </select>
                                         </div>
                                     </div>
-
-
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-6">
@@ -121,17 +120,10 @@
                                         </div>
                                     </div>
                                 </div>
-
-
-                            </div>
-                            <div class="col-md-6">
-
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
-
-                    </div>
+                    @endif
                     <div class="row">
                         <div class="col-md-12">
                             <div id="grafik-statistik" class="collapse">
