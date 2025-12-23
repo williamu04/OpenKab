@@ -2,6 +2,7 @@ Di rilis ini, versi 2512.0.1 berisi penambahan dan perbaikan yang diminta penggu
 
 #### Penambahan Fitur
 
+1. [#872](https://github.com/OpenSID/OpenKab/issues/872) Penambahan modul artikel OpenSID.
 
 #### Perbaikan BUG
 
