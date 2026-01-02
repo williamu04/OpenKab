@@ -13,6 +13,8 @@ use App\Http\Controllers\IdentitasController;
 use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\KeluargaController;
 use App\Http\Controllers\LaporanBulananController;
+use App\Http\Controllers\Master\ArtikelKabupatenController;
+use App\Http\Controllers\Master\ArtikelUploadController;
 use App\Http\Controllers\Master\BantuanKabupatenController;
 use App\Http\Controllers\PendudukController;
 use App\Http\Controllers\PlanController;
@@ -253,6 +255,8 @@ Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(f
     Route::prefix('master')
         ->group(function () {
             Route::middleware(['easyauthorize:master-data-bantuan'])->resource('bantuan', BantuanKabupatenController::class)->only(['index', 'create', 'edit']);
+            Route::middleware(['easyauthorize:master-data-artikel'])->resource('artikel', ArtikelKabupatenController::class)->names('master-data-artikel')->only(['index', 'create', 'edit']);
+            Route::post('artikel/upload-gambar', [ArtikelUploadController::class, 'uploadGambar'])->name('artikel.upload_gambar');
             Route::controller(AdminWebController::class)->group(function () {
                 Route::middleware(['permission:master-data-artikel-read'])->get('/kategori/{parrent}', 'kategori_index')->name('master-data-artikel.kategori');
                 Route::middleware(['permission:master-data-artikel-edit'])->get('/kategori/edit/{id}/{parrent}', 'kategori_edit')->name('master-data-artikel.kategori-edit');
