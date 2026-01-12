@@ -92,6 +92,11 @@ class DataPokokController extends Controller
         return view('data_pokok.infrastruktur.index', ['title' => $title]);
     }
 
+    public function cetakInfrastruktur(Request $request)
+    {
+        return view('data_pokok.infrastruktur.cetak', ['filter' => $request->getQueryString()]);
+    }
+
     public function sandang()
     {
         $title = 'Data Sandang';
