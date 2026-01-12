@@ -8,6 +8,7 @@ Di rilis ini, versi 2601.0.0 berisi penambahan dan perbaikan yang diminta penggu
 
 #### Perbaikan BUG
 
+1. [#893](https://github.com/OpenSID/OpenKab/issues/893) Perbaiki UI Layout dashboard dan sidebar.
 
 #### Perubahan Teknis
 
