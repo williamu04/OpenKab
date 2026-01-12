@@ -63,6 +63,11 @@ class DataPokokController extends Controller
         return view('data_pokok.pariwisata.index', ['title' => $title]);
     }
 
+    public function cetakPariwisata(Request $request)
+    {
+        return view('data_pokok.pariwisata.cetak', ['filter' => $request->getQueryString()]);
+    }
+
     public function pendidikan()
     {
         return view('data_pokok.pendidikan.index');
