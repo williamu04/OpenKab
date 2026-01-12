@@ -11,3 +11,4 @@ Di rilis ini, versi 2601.0.0 berisi penambahan dan perbaikan yang diminta penggu
 #### Perubahan Teknis
 
 1. [#892](https://github.com/OpenSID/OpenKab/issues/892) Perbaikan tag style agar tidak dianggap error ketika csp aktif.
+2. [#886](https://github.com/OpenSID/OpenKab/issues/886) Ubah label cetak menjadi excel pada laporan bulanan.
