@@ -105,7 +105,7 @@
 @endsection
 
 @section('css')
-    <style>
+   <style nonce="{{ csp_nonce() }}" >
         .widget-user-header {
             padding: 20px;
             background: #f4f6f9;
