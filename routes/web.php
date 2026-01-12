@@ -212,6 +212,7 @@ Route::middleware(['auth', 'teams_permission', 'password.weak', '2fa'])->group(f
             Route::middleware(['permission:datapokok-agama-adat-read'])->get('/agama/detail', 'detail_agama')->name('detail_agama');
             Route::middleware(['permission:datapokok-agama-adat-read'])->get('/agama/cetak', 'cetak_agama')->name('cetak_agama');
             Route::middleware(['permission:datapokok-infrastruktur-read'])->get('/infrastruktur', 'infrastruktur')->name('infrastruktur');
+            Route::middleware(['permission:datapokok-infrastruktur-read'])->get('/infrastruktur/cetak', 'cetakInfrastruktur')->name('infrastruktur.cetak');            
 
             Route::middleware(['permission:datapokok-sandang-read'])->get('/sandang', 'sandang')->name('datasandang');
             Route::middleware(['permission:datapokok-sandang-read'])->get('/sandang/detail', 'detail_sandang')->name('detail_datasandang');
