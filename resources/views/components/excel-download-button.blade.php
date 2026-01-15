@@ -69,7 +69,9 @@
 
                         // Prepare download URL
                         const url = new URL(downloadUrl);
-
+                        url.searchParams.set("kode_kabupaten", "{{ session('kabupaten.kode_kabupaten') ?? '' }}");
+                        url.searchParams.set("kode_kecamatan", "{{ session('kecamatan.kode_kecamatan') ?? '' }}");
+                        url.searchParams.set("kode_desa", "{{ session('desa.id') ?? '' }}");                
                         let urlParams = new URLSearchParams();
 
                         if (tableId) {
@@ -110,7 +112,7 @@
                             const info = table.page.info();
                             urlParams.append('totalData', info.recordsTotal);
                         }
-
+        
                         // Make fetch request
                         const response = await fetch(url, {
                             method: 'POST',

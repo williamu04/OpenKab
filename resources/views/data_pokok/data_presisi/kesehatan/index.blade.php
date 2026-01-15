@@ -27,24 +27,13 @@
             </div>
             <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <div class="row">
-                        <div class="col-sm-2">
-                            <select id="filter-tahun" class="form-control form-control-sm">
-                                @php
-                                    $currentYear = date('Y');
-                                    $startYear = 2020;
-                                @endphp
-                                @for($year = $currentYear; $year >= $startYear; $year--)
-                                    <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>{{ $year }}</option>
-                                @endfor
-                            </select>
-                        </div>
-                        <div class="col-sm-3">
-                            <button id="cetak" type="button" class="btn btn-primary btn-sm" data-url="">
-                                <i class="fa fa-print"></i> Cetak
-                            </button>
-                        </div>
+                     <div class="row">
+                    <x-filter-tahun />
+                    <div class="col-auto">
+                        <x-print-button :print-url="url('data-presisi/kesehatan/cetak')" table-id="table-kesehatan" :filter="[]" />
                     </div>
+                    <x-excel-download-button :download-url="config('app.databaseGabunganUrl') . '/api/v1/data-presisi/kesehatan/rtm/download'" table-id="table-kesehatan" filename="data_presisi_kesehatan" />
+                </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -82,8 +71,7 @@
             var dtks = $('#table-kesehatan').DataTable({
                 processing: true,
                 serverSide: true,
-                autoWidth: false,
-                ordering: false,
+                autoWidth: false,                
                 searchPanes: {
                     viewTotal: false,
                     columns: [0]
@@ -96,16 +84,15 @@
                         return {
                             "page[size]": row.length,
                             "page[number]": (row.start / row.length) + 1,
-                            "filter[search]": row.search.value,
-                            "kode_kecamatan": "{{ session('kecamatan.kode_kecamatan') ?? '' }}",
-                            "config_desa": "{{ session('desa.id') ?? '' }}",
+                            "filter[search]": row.search.value,                            
                             "filter[tahun]": $('#filter-tahun').val(),
+                            "sort":"id"
                         };
                     },
                     dataSrc: function(json) {
-                        if (json.data.length > 0) {
-                            json.recordsTotal = json.meta.pagination.total
-                            json.recordsFiltered = json.meta.pagination.total
+                        json.recordsTotal = json.meta?.pagination?.total || 0;
+                        json.recordsFiltered = json.meta?.pagination?.total || 0;
+                        if (json.data.length > 0) {                            
                             data_grafik = [];
                             json.data.forEach(function(item, index) {
                                 data_grafik.push(item.attributes)
@@ -144,7 +131,7 @@
                     },
                     {
                         "className": 'details-control',
-                        "orderable": false,
+                        orderable: false,
                         "data": null,
                         "defaultContent": ''
                     },
@@ -154,17 +141,21 @@
                     },
                     {
                         data: "attributes.kepala_keluarga",
+                        orderable: false,
                     },
                     {
                         data: "attributes.jumlah_anggota",
+                        orderable: false,
                     },
                     {
                         data: "attributes.jns_ansuransi",
                         render: (data) => data || 'N/A',
+                        orderable: false,
                     },
                     {
                         data: "attributes.jns_penggunaan_alat_kontrasepsi",
                         render: (data) => data || 'N/A',
+                        orderable: false,
                     },
 
                 ],
@@ -223,14 +214,7 @@
                 dtks.ajax.reload();
                 data_grafik = [];
                 grafikPie();
-            });
-            
-            $('#cetak').on('click', function() {
-                let baseUrl = "{{ route('data-pokok.data-presisi.cetak') }}";
-                let params = dtks.ajax.params(); // Get DataTables params
-                let queryString = new URLSearchParams(params).toString(); // Convert params to query string
-                window.open(`${baseUrl}?${queryString}`, '_blank'); // Open the URL with appended query
-            });
+            });                    
         })
     </script>
 @endsection
