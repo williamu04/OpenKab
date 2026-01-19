@@ -30,7 +30,12 @@
             <div class="card card-outline card-primary">
                 <div class="card-header">
                     <div class="row">
-                        <div class="col-sm-2">
+                        <x-filter-tahun />
+                        <div class="col-auto">
+                            <x-print-button :print-url="route('cetak_agama')" table-id="agama" :filter="[]" />
+                        </div>
+                        <x-excel-download-button :download-url="config('app.databaseGabunganUrl') . '/api/v1/data-presisi/agama/rtm/download'" table-id="agama" filename="data_presisi_agama" />
+                        <!-- <div class="col-sm-2">
                             <select id="filter-tahun" class="form-control form-control-sm">
                                 @php
                                     $currentYear = date('Y');
@@ -45,7 +50,7 @@
                             <button id="cetak" type="button" class="btn btn-primary btn-sm" data-url="">
                                 <i class="fa fa-print"></i> Cetak
                             </button>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="card-body">
@@ -274,13 +279,6 @@
                 agama.ajax.reload();
                 data_grafik = [];
                 grafikPie();
-            });
-
-            $('#cetak').on('click', function() {
-                let baseUrl = "{{ route('cetak_agama') }}";
-                let params = agama.ajax.params(); // Get DataTables params
-                let queryString = new URLSearchParams(params).toString(); // Convert params to query string
-                window.open(`${baseUrl}?${queryString}`, '_blank'); // Open the URL with appended query
             });
         })
     </script>
