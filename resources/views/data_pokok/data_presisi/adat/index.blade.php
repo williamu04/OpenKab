@@ -34,7 +34,7 @@
                     <div class="col-auto">
                         <x-print-button :print-url="url('data-pokok/data-presisi-adat/cetak')" table-id="adat" :filter="[]" />
                     </div>
-                    <x-excel-download-button :download-url="config('app.databaseGabunganUrl') . '/api/v1/data-presisi/adat/download'" table-id="adat" filename="data_adat" />
+                    <x-excel-download-button :download-url="config('app.databaseGabunganUrl') . '/api/v1/data-presisi/adat/rtm/download'" table-id="adat" filename="data_adat" />
                 </div>
             </div>
             <div class="card-body">
@@ -67,7 +67,7 @@
     let transformedIncluded = {};
     document.addEventListener("DOMContentLoaded", function(event) {
         const header = @include('layouts.components.header_bearer_api_gabungan');
-        var url = new URL("{{ config('app.databaseGabunganUrl') . '/api/v1/data-presisi/adat' }}");
+        var url = new URL("{{ config('app.databaseGabunganUrl') . '/api/v1/data-presisi/adat/rtm' }}");
         url.searchParams.set("kode_kabupaten", "{{ session('kabupaten.kode_kabupaten') ?? '' }}");
         url.searchParams.set("kode_kecamatan", "{{ session('kecamatan.kode_kecamatan') ?? '' }}");
         url.searchParams.set("config_desa", "{{ session('desa.id') ?? '' }}");
@@ -87,12 +87,9 @@
                 data: function(row) {
                     return {
                         "page[size]": row.length,
-                        "page[number]": (row.start / row.length) + 1,
-                        'include': 'anggota,penduduk,rtm,keluarga',
-                        "filter[search]": row.search.value,
-                        "filter[kepala_rtm]": true,
-                        "sort": "id",
-                        "filter[kode_desa]": $("#kode_desa").val(),
+                        "page[number]": (row.start / row.length) + 1,                        
+                        "filter[search]": row.search.value,                        
+                        "sort": "id",                        
                         "filter[tahun]": $('#filter-tahun').val(),
                     };
                 },
@@ -101,43 +98,9 @@
                     json.recordsFiltered = json.meta?.pagination?.total || 0
                     if (json.data.length > 0) {                        
                         data_grafik = [];
-                        // Transform the included array into an object
-                        transformedIncluded = json.included.reduce((acc, item) => {
-                            if (!acc[item.type]) {
-                                acc[item.type] = {};
-                            }
-                            acc[item.type][item.id] = item.attributes;
-                            return acc;
-                        }, {});
-
                         json.data.forEach(function(item, index) {
                             data_grafik.push(item.attributes)
-                            item.attributes.nik = transformedIncluded.penduduk[item
-                                .relationships.penduduk.data.id].nik;
-                            item.attributes.nama = transformedIncluded.penduduk[item
-                                .relationships.penduduk.data.id].nama;
-                            if (!item.attributes.frekwensi) {
-                                item.attributes.frekwensi = 'TIDAK TAHU'
-                            }
-                            if (!item.attributes.status_keanggotaan) {
-                                item.attributes.status_keanggotaan = 'TIDAK TAHU'
-                            }
-                            item.attributes.dtks = transformedIncluded.rtm[item
-                                    .relationships.rtm.data.id].dtks ? 'Terdaftar' :
-                                'Tidak Terdaftar';
-                            item.attributes.tgl_daftar = transformedIncluded.rtm[item
-                                .relationships.rtm.data.id].tgl_daftar;
-                            item.attributes.jumlah_kk = transformedIncluded.rtm[item
-                                .relationships.rtm.data.id].jumlah_kk;
-                            item.attributes.alamat = transformedIncluded.keluarga[item
-                                .relationships.keluarga.data.id].alamat;
-                            item.attributes.dusun = transformedIncluded.keluarga[item
-                                .relationships.keluarga.data.id].wilayah?.dusun;
-                            item.attributes.rt = transformedIncluded.keluarga[item
-                                .relationships.keluarga.data.id].wilayah?.rt;
-                            item.attributes.rw = transformedIncluded.keluarga[item
-                                .relationships.keluarga.data.id].wilayah?.rw;
-                        })
+                        })                        
                         grafikPie()
                         return json.data;
                     }
@@ -151,16 +114,13 @@
             columns: [{
                     data: function(data) {
                         let d = data.attributes
-                        let obj = {
-                            'rtm_id': data.relationships.rtm.data.id,
-                            'no_kartu_rumah': transformedIncluded.rtm[data.relationships.rtm
-                                .data.id].no_kk,
-                            'nama_kepala_keluarga': d.nama,
-                            'alamat': transformedIncluded.keluarga[data.relationships
-                                .keluarga.data.id].alamat,
-                            'jumlah_anggota': d.anggota_count,
-                            'jumlah_kk': transformedIncluded.rtm[data.relationships.rtm
-                                .data.id].jumlah_kk,
+                         let obj = {
+                            'rtm_id': data.id,
+                            'no_kartu_rumah': d.no_kk,
+                            'nama_kepala_keluarga': d.kepala_keluarga,
+                            'alamat': d.alamat,
+                            'jumlah_anggota': d.jumlah_anggota,
+                            'jumlah_kk': d.jumlah_kk,
                         }
                         let jsonData = encodeURIComponent(JSON.stringify(obj));
                         const _url =
@@ -181,18 +141,15 @@
                 },
                 {
                     data: "attributes.nik",
-                    name: "penduduk.nik",
-                },
-                {
-                    data: "attributes.nama",
-                    name: "rtm.nama_kepala_keluarga",
-                    orderable: false
-                },
-                {
-                    data: "attributes.anggota_count",
-                    name: null,
                     orderable: false,
-                    searchable: false
+                },
+                {
+                    data: "attributes.kepala_keluarga",
+                    orderable: false,
+                },
+                {
+                    data: "attributes.jumlah_anggota",
+                    orderable: false,
                 },
                 {
                     data: "attributes.status_keanggotaan",
@@ -201,7 +158,7 @@
                     searchable: false
                 },
                 {
-                    data: "attributes.frekwensi",
+                    data: "attributes.frekwensi_mengikuti_kegiatan_setahun",
                     name: "frekwensi_mengikuti_kegiatan_setahun",
                     orderable: false,
                     searchable: false
