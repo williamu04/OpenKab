@@ -72,6 +72,13 @@
 
                         let urlParams = new URLSearchParams();
 
+                        // Add additional params
+                        @if ($additionalParams)
+                            @foreach ($additionalParams as $param)
+                                urlParams.append('{{ $param['key'] }}', '{{ $param['value'] }}');
+                            @endforeach
+                        @endif
+                        
                         if (tableId) {
                             // Get filter parameters from DataTable
                             const table = $('#' + tableId).DataTable();
