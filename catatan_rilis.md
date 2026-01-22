@@ -7,6 +7,7 @@ Di rilis ini, versi 2601.0.0 berisi penambahan dan perbaikan yang diminta penggu
 3. [#885](https://github.com/OpenSID/OpenKab/issues/885) Penambahan fungsi ekspor excel pada data daftar data keluarga.
 4. [#896](https://github.com/OpenSID/OpenKab/issues/896) Penambahan fungsi cetak pada data presisi infrastruktur.
 5. [#897](https://github.com/OpenSID/OpenKab/issues/897) Penambahan fungsi cetak pada data presisi pariwisata.
+6. [#905](https://github.com/OpenSID/OpenKab/issues/905) Penambahan fungsi export data presisi pangan.
 
 #### Perbaikan BUG
 
