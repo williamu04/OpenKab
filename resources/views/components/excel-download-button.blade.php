@@ -80,7 +80,6 @@
                                 urlParams.append('{{ $param['key'] }}', '{{ $param['value'] }}');
                             @endforeach
                         @endif
-                        
                         if (tableId) {
                             // Get filter parameters from DataTable
                             const table = $('#' + tableId).DataTable();
