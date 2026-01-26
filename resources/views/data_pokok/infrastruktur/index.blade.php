@@ -45,6 +45,7 @@
                     <div class="col-auto">
                         <x-print-button :print-url="url('data-pokok/infrastruktur/cetak')" table-id="infrastruktur" :filter="[]" />
                     </div>
+                    <x-excel-download-button :download-url="config('app.databaseGabunganUrl') . '/api/v1/infrastruktur/download'" table-id="infrastruktur" filename="data_infrastruktur" />
                 </div>
                 <div class="table-responsive">
                     <table class="table table-striped" id="infrastruktur">

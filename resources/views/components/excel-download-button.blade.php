@@ -112,7 +112,7 @@
                             const info = table.page.info();
                             urlParams.append('totalData', info.recordsTotal);
                         }
-
+        
                         // Make fetch request
                         const response = await fetch(url, {
                             method: 'POST',
