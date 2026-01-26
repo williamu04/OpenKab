@@ -10,6 +10,7 @@ Di rilis ini, versi 2601.0.0 berisi penambahan dan perbaikan yang diminta penggu
 6. [#905](https://github.com/OpenSID/OpenKab/issues/905) Penambahan fungsi expor data presisi pangan.
 7. [#902](https://github.com/OpenSID/OpenKab/issues/902) Penambahan fitur expor & cetak pada halaman data peserta bantuan.
 8. [#907](https://github.com/OpenSID/OpenKab/issues/907) Penambahan fitur expor excel pada data presisi pendidikan.
+9. [#906](https://github.com/OpenSID/OpenKab/issues/906) Penambahan expor excel pada data presisi pangan.
 
 #### Perbaikan BUG
 
