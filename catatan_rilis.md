@@ -12,6 +12,7 @@ Di rilis ini, versi 2601.0.0 berisi penambahan dan perbaikan yang diminta penggu
 8. [#907](https://github.com/OpenSID/OpenKab/issues/907) Penambahan fitur expor excel pada data presisi pendidikan.
 9. [#906](https://github.com/OpenSID/OpenKab/issues/906) Penambahan expor excel pada data presisi pangan.
 10. [#916](https://github.com/OpenSID/OpenKab/issues/916) Penambahan expor excel pada data presisi ketenagakerjaan.
+11. [#908](https://github.com/OpenSID/OpenKab/issues/908) Penambahan expor excel pada data presisi seni budaya.
 
 #### Perbaikan BUG
 
