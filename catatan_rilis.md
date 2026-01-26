@@ -17,6 +17,7 @@ Di rilis ini, versi 2601.0.0 berisi penambahan dan perbaikan yang diminta penggu
 13. [#921](https://github.com/OpenSID/OpenKab/issues/921) Penambahan fitur expor excel pada data presisi jaminan sosial.
 14. [#920](https://github.com/OpenSID/OpenKab/issues/920) Penambahan fitur expor excel pada data presisi parawisata.
 15. [#923](https://github.com/OpenSID/OpenKab/issues/923) Penambahan fitur expor excel pada data presisi adat.
+16. [#922](https://github.com/OpenSID/OpenKab/issues/922) Penambahan expor excel pada data presisi agama.
 
 #### Perbaikan BUG
 
