@@ -57,6 +57,7 @@
                     <div class="col-auto">
                         <x-print-button :print-url="url('data-pokok/pariwisata/cetak')" table-id="pariwisata" :filter="[]" />
                     </div>
+                    <x-excel-download-button :download-url="config('app.databaseGabunganUrl') . '/api/v1/pariwisata/download'" table-id="pariwisata" filename="data_pariwisata" />
                 </div>
                 <div class="table-responsive">
                     <table class="table table-striped" id="pariwisata">
@@ -118,9 +119,7 @@
                         "filter[kategori]": $('#filter-kategori-wisata').val(),
                         "filter[sarana-wisata]": $('#filter-sarana-wisata').val(),
                         "filter[potensi-wisata]": $('#filter-komoditas-wisata').val(),
-                        "sort": (row.order[0]?.dir === "asc" ? "" : "-") + row.columns[row.order[0]
-                                ?.column]
-                            ?.name,
+                        "sort": "id",
                     };
                 },
                 dataSrc: function(json) {
