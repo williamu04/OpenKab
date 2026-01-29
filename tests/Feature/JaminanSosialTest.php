@@ -13,7 +13,7 @@ class JaminanSosialTest extends BaseTestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('data_pokok.jaminan_sosial.index');
-        $response->assertViewHas('title', 'Data Kepesertaan Program dan Statistik');
+        $response->assertSee('Data Kepesertaan Program dan Statistik');
     }
 
     /** @test */
@@ -32,6 +32,14 @@ class JaminanSosialTest extends BaseTestCase
         $this->assertStringContainsString('id="pie1"', $content, 'Chart pie1 tidak ditemukan');
         $this->assertStringContainsString('id="pie2"', $content, 'Chart pie2 tidak ditemukan');
         $this->assertStringContainsString('id="pie4"', $content, 'Chart pie4 tidak ditemukan');
+        
+        // Test print button exists
+        $this->assertStringContainsString('btn btn-primary btn-sm', $content, 'Print button tidak ditemukan');
+        $this->assertStringContainsString('id="print-btn-jaminanSosial"', $content, 'Print button ID tidak ditemukan');
+        
+        // Test excel download button exists
+        $this->assertStringContainsString('btn btn-success btn-sm', $content, 'Excel download button tidak ditemukan');
+        $this->assertStringContainsString('id="download-excel"', $content, 'Excel download button ID tidak ditemukan');
     }
 
     /** @test */
@@ -46,9 +54,9 @@ class JaminanSosialTest extends BaseTestCase
             'NIK',
             'Nama Kepala Keluarga',
             'Jumlah Anggota RTM',
-            'Jenis Bantuan Sosial',
-            'Jenis Gangguan Mental',
-            'Jenis Penanganan',
+            'Jenis Bantuan Sosial<br> Yang Pernah Diterima',
+            'Jenis Gangguan Mental<br> Yang Diderita',
+            'Jenis Penanganan <br>Penderita Gangguan Mental',
         ];
 
         foreach ($expectedColumns as $column) {
@@ -63,8 +71,8 @@ class JaminanSosialTest extends BaseTestCase
         $content = $response->getContent();
 
         // Test print button rendered HTML exists (component is rendered to actual button)
-        $this->assertStringContainsString('fa-print', $content, 'Icon print tidak ditemukan');
-        $this->assertStringContainsString('jaminan-sosial/cetak', $content, 'Route print tidak ditemukan');
+        $this->assertStringContainsString('fa fa-print', $content, 'Icon print tidak ditemukan');
+        $this->assertStringContainsString('data-print-url="http://127.0.0.1:8000/data-pokok/jaminan-sosial/cetak', $content, 'Route print tidak ditemukan');
     }
 
     /** @test */
@@ -74,8 +82,8 @@ class JaminanSosialTest extends BaseTestCase
         $content = $response->getContent();
 
         // Test excel download button rendered HTML exists (component is rendered to actual button)
-        $this->assertStringContainsString('fa-file-excel', $content, 'Icon excel tidak ditemukan');
-        $this->assertStringContainsString('btn-success', $content, 'Tombol Excel dengan class btn-success tidak ditemukan');
+        $this->assertStringContainsString('fa fa-file-excel', $content, 'Icon excel tidak ditemukan');
+        $this->assertStringContainsString('data-download-url=', $content, 'Download URL tidak ditemukan');
     }
 
     /** @test */
@@ -102,6 +110,7 @@ class JaminanSosialTest extends BaseTestCase
         // Test filter tahun change event listener exists
         $this->assertStringContainsString("$('#filter-tahun').on('change'", $content, 'Event listener filter tahun tidak ditemukan');
         $this->assertStringContainsString('jaminanSosial.ajax.reload()', $content, 'DataTable reload pada filter tahun tidak ditemukan');
+        $this->assertStringContainsString('grafikPie()', $content, 'Grafik reload pada filter tahun tidak ditemukan');
     }
 
     /** @test */
@@ -113,6 +122,7 @@ class JaminanSosialTest extends BaseTestCase
         // Test detail control for expandable rows
         $this->assertStringContainsString('details-control', $content, 'Detail control class tidak ditemukan');
         $this->assertStringContainsString("jaminanSosial.on('click', 'td.details-control'", $content, 'Event listener detail control tidak ditemukan');
+        $this->assertStringContainsString('row.child.isShown()', $content, 'Logika expand/collapse detail control tidak ditemukan');
     }
 
     /** @test */
@@ -123,6 +133,7 @@ class JaminanSosialTest extends BaseTestCase
 
         // Test detail button route exists (rendered as actual URL)
         $this->assertStringContainsString('jaminan-sosial/detail', $content, 'Route detail tidak ditemukan');
+        $this->assertStringContainsString('?data=__DATA__', $content, 'Parameter data pada route detail tidak ditemukan');
     }
 
     /** @test */
@@ -132,9 +143,9 @@ class JaminanSosialTest extends BaseTestCase
         $content = $response->getContent();
 
         // Test filter parameters in DataTable
-        $this->assertStringContainsString('"filter[kode_desa]"', $content, 'Filter kode_desa tidak ditemukan');
-        $this->assertStringContainsString('"filter[tahun]"', $content, 'Filter tahun tidak ditemukan');
-        $this->assertStringContainsString('"filter[kepala_rtm]"', $content, 'Filter kepala_rtm tidak ditemukan');
+        $this->assertStringContainsString('"page[size]"', $content, 'Filter page[size] tidak ditemukan');
+        $this->assertStringContainsString('"page[number]"', $content, 'Filter page[number] tidak ditemukan');
         $this->assertStringContainsString("'include': 'anggota,penduduk,rtm,keluarga'", $content, 'Include relationships tidak ditemukan');
+        $this->assertStringContainsString('"filter[search]"', $content, 'Filter search tidak ditemukan');
     }
 }
