@@ -30,8 +30,8 @@ class DataPresisiExcelDownloadTest extends BaseTestCase
         if ($response->status() === 200) {
             $content = $response->getContent();
 
-            // Test komponen x-excel-download-button ada di halaman
-            $this->assertStringContainsString('excel-download-button', $content);
+            // Test komponen x-download-excel ada di halaman
+            $this->assertStringContainsString('download-excel', $content);
             $this->assertStringContainsString('table-pangan', $content);
             $this->assertStringContainsString('/api/v1/data-presisi/pangan/rtm/download', $content);
             $this->assertStringContainsString('data_presisi_pangan', $content);
@@ -48,8 +48,8 @@ class DataPresisiExcelDownloadTest extends BaseTestCase
         if ($response->status() === 200) {
             $content = $response->getContent();
 
-            // Test komponen x-excel-download-button ada di halaman
-            $this->assertStringContainsString('excel-download-button', $content);
+            // Test komponen x-download-excel ada di halaman
+            $this->assertStringContainsString('download-excel', $content);
             $this->assertStringContainsString('table-pendidikan', $content);
             $this->assertStringContainsString('/api/v1/data-presisi/pendidikan/rtm/download', $content);
             $this->assertStringContainsString('data_presisi_pendidikan', $content);
@@ -101,9 +101,9 @@ class DataPresisiExcelDownloadTest extends BaseTestCase
         $panganContent = $panganResponse->getContent();
         $pendidikanContent = $pendidikanResponse->getContent();
 
-        // Both should have x-excel-download-button component
-        $panganHasButton = strpos($panganContent, 'excel-download-button') !== false;
-        $pendidikanHasButton = strpos($pendidikanContent, 'excel-download-button') !== false;
+        // Both should have x-download-excel component
+        $panganHasButton = strpos($panganContent, 'download-excel') !== false;
+        $pendidikanHasButton = strpos($pendidikanContent, 'download-excel') !== false;
 
         $this->assertTrue($panganHasButton, 'Pangan page should have excel download button');
         $this->assertTrue($pendidikanHasButton, 'Pendidikan page should have excel download button');
@@ -115,9 +115,9 @@ class DataPresisiExcelDownloadTest extends BaseTestCase
         $this->assertTrue($panganHasFilter, 'Pangan page should have filter tahun');
         $this->assertTrue($pendidikanHasFilter, 'Pendidikan page should have filter tahun');
 
-        // Both should have print-button component
-        $panganHasPrint = strpos($panganContent, 'print-button') !== false;
-        $pendidikanHasPrint = strpos($pendidikanContent, 'print-button') !== false;
+        // Both should have print-btn component
+        $panganHasPrint = strpos($panganContent, 'print-btn') !== false;
+        $pendidikanHasPrint = strpos($pendidikanContent, 'print-btn') !== false;
 
         $this->assertTrue($panganHasPrint, 'Pangan page should have print button');
         $this->assertTrue($pendidikanHasPrint, 'Pendidikan page should have print button');
