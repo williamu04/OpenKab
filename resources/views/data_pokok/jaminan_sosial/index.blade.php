@@ -56,22 +56,15 @@
             <div class="card card-outline card-primary">
                 <div class="card-header">
                     <div class="row">
-                        <div class="col-sm-2">
-                            <select id="filter-tahun" class="form-control form-control-sm">
-                                @php
-                                    $currentYear = date('Y');
-                                    $startYear = 2020;
-                                @endphp
-                                @for($year = $currentYear; $year >= $startYear; $year--)
-                                    <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>{{ $year }}</option>
-                                @endfor
-                            </select>
+                        <x-filter-tahun />
+                        <div class="col-auto">
+                            <x-print-button :print-url="route('jaminan-sosial-cetak')" table-id="jaminanSosial" :filter="[]" />
                         </div>
-                        <div class="col-sm-3">
-                            <button id="cetak" type="button" class="btn btn-primary btn-sm" data-url="">
-                                <i class="fa fa-print"></i> Cetak
-                            </button>
-                        </div>
+                        <x-excel-download-button :download-url="config('app.databaseGabunganUrl') . '/api/v1/data-presisi/jaminan-sosial/rtm/download'" table-id="jaminanSosial" filename="data_presisi_jaminan-sosial" :additional-params="[
+                                ['key' => 'kode_kabupaten', 'value' => session('kabupaten.kode_kabupaten') ?? ''],
+                                ['key' => 'kode_kecamatan', 'value' => session('kecamatan.kode_kecamatan') ?? ''],
+                                ['key' => 'config_desa', 'value' => session('desa.id') ?? ''],
+                            ]"/>
                     </div>
                 </div>
                 <div class="card-body">
@@ -128,12 +121,6 @@
                             "page[number]": (row.start / row.length) + 1,
                             'include': 'anggota,penduduk,rtm,keluarga',
                             "filter[search]": row.search.value,
-                            "filter[kepala_rtm]": true,
-                            // "sort": (row.order[0]?.dir === "asc" ? "" : "-") + row.columns[row.order[0]
-                            //         ?.column]
-                            //     ?.name,
-                            "filter[kode_desa]": $("#kode_desa").val(),
-                            "filter[tahun]": $("#filter-tahun").val(),
                         };
                     },
                     dataSrc: function(json) {
@@ -314,12 +301,6 @@
                     </table>
                 `;
             }
-            $('#cetak').on('click', function() {
-                let baseUrl = "{{ route('jaminan-sosial-cetak') }}";
-                let params = jaminanSosial.ajax.params(); // Get DataTables params
-                let queryString = new URLSearchParams(params).toString(); // Convert params to query string
-                window.open(`${baseUrl}?${queryString}`, '_blank'); // Open the URL with appended query
-            });
         })
     </script>
 @endsection

@@ -7,7 +7,7 @@
 @stop
 
 @push('css')
-    <style>
+   <style nonce="{{ csp_nonce() }}" >
         .details {
             margin-left: 20px;
         }
@@ -28,27 +28,17 @@
             <div class="card card-outline card-primary">
                 <div class="card-header">
                     <div class="row">
-                        <div class="col-sm-2">
-                            <select id="filter-tahun" class="form-control form-control-sm">
-                                @php
-                                    $currentYear = date('Y');
-                                    $startYear = 2020;
-                                @endphp
-                                @for($year = $currentYear; $year >= $startYear; $year--)
-                                    <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>{{ $year }}</option>
-                                @endfor
-                            </select>
+                        <x-filter-tahun />
+                        <div class="col-auto">
+                            <x-print-button :print-url="url('data-presisi/seni-budaya/cetak')" table-id="table-seni-budaya" :filter="[]" />
                         </div>
-                        <div class="col-sm-3">
-                            <button id="cetak" type="button" class="btn btn-primary btn-sm" data-url="">
-                                <i class="fa fa-print"></i> Cetak
-                            </button>
-                        </div>
+                        <x-excel-download-button :download-url="config('app.databaseGabunganUrl') . '/api/v1/data-presisi/seni-budaya/rtm/download'" table-id="table-seni-budaya" filename="data_presisi_seni-budaya" />
+
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table-kesehatan">
+                        <table class="table table-striped" id="table-seni-budaya">
                             <thead>
                                 <tr>
                                     <th>Aksi</th>
@@ -80,7 +70,7 @@
             url.searchParams.set("kode_kecamatan", "{{ session('kecamatan.kode_kecamatan') ?? '' }}");
             url.searchParams.set("kode_desa", "{{ session('desa.id') ?? '' }}");
 
-            var dtks = $('#table-kesehatan').DataTable({
+            var dtks = $('#table-seni-budaya').DataTable({
                 processing: true,
                 serverSide: true,
                 autoWidth: false,
@@ -224,13 +214,6 @@
                 dtks.ajax.reload();
                 data_grafik = [];
                 grafikPie();
-            });
-
-            $('#cetak').on('click', function() {
-                let baseUrl = "{{ route('data-pokok.data-presisi-seni-budaya.cetak') }}";
-                let params = dtks.ajax.params(); // Get DataTables params
-                let queryString = new URLSearchParams(params).toString(); // Convert params to query string
-                window.open(`${baseUrl}?${queryString}`, '_blank'); // Open the URL with appended query
             });
         });
     </script>
