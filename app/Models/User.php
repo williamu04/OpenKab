@@ -131,7 +131,7 @@ class User extends Authenticatable
 
     public function getTeamId()
     {
-        return $this->team()->first()?->id;
+        return $this->team->first()?->id;
     }
 
     public function adminlte_profile_url()
@@ -141,7 +141,7 @@ class User extends Authenticatable
 
     public function adminlte_desc()
     {
-        return $this->team()->first()->name;
+        return $this->team->first()->name;
     }
 
     public function isSuperAdmin()

@@ -41,7 +41,7 @@
         "doctrine/dbal": "^3.6",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.13",
-        "laravel/sail": "^1.26",
+        "laravel/sail": "^1.53",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
         "phpunit/phpunit": "^10.1",
